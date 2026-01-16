@@ -1,0 +1,302 @@
+/* ========================================================================
+   VISTA GENERAL DE EXPEDIENTES - ESTILO NETFLIX
+   ======================================================================== */
+
+/* Contenedor principal */
+.vista-general-expedientes {
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  color: #1f2937;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Board de expedientes */
+.expedientes-board {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 40px;
+  background: #ffffff;
+  border-bottom: 2px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.board-header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+/* Zona de eliminación */
+.zona-eliminacion-notas {
+  width: 80px;
+  height: 60px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px dashed #f87171;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 200;
+  margin-right: 20px;
+}
+
+.zona-eliminacion-notas:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.zona-eliminacion-notas.drag-over {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border-color: #991b1b;
+  border-style: solid;
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5);
+}
+
+.papelera-icono {
+  font-size: 20px;
+  margin-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.papelera-texto {
+  font-size: 10px;
+  font-weight: 600;
+  color: #dc2626;
+  text-align: center;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.zona-eliminacion-notas.drag-over .papelera-texto {
+  color: white;
+}
+
+/* Botones del header */
+.header-buttons {
+  position: absolute;
+  right: 40px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.back-button, .casos-button {
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #495057;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.back-button:hover, .casos-button:hover {
+  background: #e9ecef;
+  color: #212529;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Efectos hover para botones mejorados */
+.back-button:hover, .casos-button:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .board-header {
+    padding: 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .board-header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .header-buttons {
+    position: static;
+    justify-content: center;
+  }
+  
+  .zona-eliminacion-notas {
+    width: 60px;
+    height: 50px;
+    margin-right: 10px;
+  }
+}
+
+
+/* ========================================================================
+   TARJETAS CATEGORIZADAS - TAREAS, COORDINACIONES, DILIGENCIAS
+   ======================================================================== */
+
+.expediente-card-categorizado {
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.expediente-card-categorizado:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+}
+
+.expediente-card-categorizado:active {
+  cursor: grabbing !important;
+}
+
+/* Estado de arrastre */
+.expediente-card-categorizado.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+  cursor: grabbing !important;
+}
+
+/* Indicador visual cuando se arrastra sobre una tarjeta */
+.expediente-card-categorizado.drag-over-item {
+  border-top: 3px dashed currentColor !important;
+  padding-top: 20px !important;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Columna con drag over */
+.column.drag-over {
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px dashed #3b82f6;
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Animaciones para notificaciones */
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* Scrollbar personalizado para el contenedor principal */
+.vista-general-expedientes div[style*="overflowY: auto"]::-webkit-scrollbar {
+  width: 10px;
+}
+
+.vista-general-expedientes div[style*="overflowY: auto"]::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.vista-general-expedientes div[style*="overflowY: auto"]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.vista-general-expedientes div[style*="overflowY: auto"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Headers sticky */
+.column h2 {
+  position: sticky;
+  top: 0;
+  background: #f3f4f6;
+  z-index: 10;
+  padding-top: 4px;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expediente-card-categorizado {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Responsive para las columnas */
+@media (max-width: 1200px) {
+  div[style*="gridTemplateColumns: repeat(3, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  div[style*="gridTemplateColumns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Estados vacíos */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+/* Badges de prioridad con animación */
+div[style*="textTransform: uppercase"] {
+  transition: all 0.2s ease;
+}
+
+.expediente-card-categorizado:hover div[style*="textTransform: uppercase"] {
+  transform: scale(1.05);
+}

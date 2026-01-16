@@ -1,0 +1,92 @@
+{
+  "name": "estudio-juridico",
+  "version": "1.0.0",
+  "description": "Sistema de gestión para estudio jurídico",
+  "author": "Tu Estudio Jurídico",
+  "main": "public/electron.js",
+  "homepage": "./",
+  "private": true,
+  "dependencies": {
+    "express": "^5.2.1",
+    "firebase": "^10.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "cross-env NODE_OPTIONS=--max-old-space-size=4096 react-scripts start",
+    "start:low-memory": "cross-env NODE_OPTIONS=--max-old-space-size=2048 react-scripts start",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "concurrently \"cross-env BROWSER=none NODE_OPTIONS=--max-old-space-size=4096 npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:dev": "concurrently \"cross-env BROWSER=none NODE_OPTIONS=--max-old-space-size=4096 npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && electron-builder",
+    "electron:build-win": "npm run build && electron-builder --win --x64"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "com.estudiojuridico.app",
+    "productName": "Estudio Jurídico",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "public/electron.js",
+      "public/preload.js"
+    ],
+    "directories": {
+      "buildResources": "public",
+      "output": "dist"
+    },
+    "extraFiles": [
+      {
+        "from": "build",
+        "to": "build",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

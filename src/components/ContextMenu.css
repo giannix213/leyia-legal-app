@@ -1,0 +1,119 @@
+/* Overlay para cerrar el menú */
+.context-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  background: transparent;
+}
+
+/* Menú contextual principal */
+.context-menu {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  min-width: 220px;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: contextMenuAppear 0.15s ease-out;
+}
+
+@keyframes contextMenuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header del menú */
+.context-menu-header {
+  padding: 12px 16px 8px 16px;
+}
+
+.context-menu-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+/* Divisor */
+.context-menu-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 8px 12px;
+}
+
+/* Items del menú */
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.context-menu-item:hover {
+  background: #f8fafc;
+}
+
+/* Item de eliminar con estilo especial */
+.context-menu-delete {
+  color: #dc2626;
+}
+
+.context-menu-delete:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.context-menu-delete:hover .context-menu-icon {
+  transform: scale(1.1);
+}
+
+/* Iconos */
+.context-menu-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+/* Texto */
+.context-menu-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .context-menu {
+    min-width: 200px;
+    font-size: 13px;
+  }
+  
+  .context-menu-item {
+    padding: 14px 16px;
+  }
+}

@@ -1,0 +1,760 @@
+.casos-container-modern {
+  padding: 24px 60px;
+  background: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Optimizations for smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.casos-container-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 0, 150, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Card Grid - Optimized */
+.casos-grid-card {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  /* Performance optimizations */
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+/* Game Card Style - Optimized for smooth scrolling */
+.caso-card-game {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: 0;
+  border: none;
+  overflow: hidden;
+  cursor: grab;
+  transition: all 0.2s ease;
+  background: rgba(0, 0, 0, 0.05) !important;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Lomo del libro - Efecto de libro real */
+.caso-card-game::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px; /* Lomo más delgado */
+  background: linear-gradient(180deg, 
+    #1a1a1a 0%, 
+    #000000 15%, 
+    #2a2a2a 30%, 
+    #000000 45%, 
+    #1a1a1a 60%, 
+    #000000 75%, 
+    #2a2a2a 90%, 
+    #000000 100%
+  );
+  z-index: 10;
+  box-shadow: 
+    inset -2px 0 4px rgba(0, 0, 0, 0.8),
+    inset 2px 0 2px rgba(255, 255, 255, 0.1),
+    2px 0 8px rgba(0, 0, 0, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Líneas decorativas del lomo */
+.caso-card-game .card-content::before {
+  content: '';
+  position: absolute;
+  left: -25px; /* Ajustado para el padding de 28px */
+  top: 20%;
+  bottom: 20%;
+  width: 1px;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 20%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(255, 255, 255, 0.3) 80%, 
+    transparent 100%
+  );
+  z-index: 11;
+}
+
+.caso-card-game .card-content::after {
+  content: '';
+  position: absolute;
+  left: -22px; /* Ajustado para el padding de 28px */
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 30%, 
+    rgba(255, 255, 255, 0.05) 50%, 
+    rgba(255, 255, 255, 0.2) 70%, 
+    transparent 100%
+  );
+  z-index: 11;
+}
+
+/* Efecto de profundidad en el lomo */
+.caso-card-game::after {
+  content: '';
+  position: absolute;
+  left: 8px; /* Ajustado al nuevo ancho del lomo */
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(90deg, 
+    rgba(0, 0, 0, 0.4) 0%, 
+    transparent 100%
+  );
+  z-index: 9;
+}
+
+.caso-card-game:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Efecto hover en el lomo */
+.caso-card-game:hover::before {
+  background: linear-gradient(180deg, 
+    #2a2a2a 0%, 
+    #1a1a1a 15%, 
+    #3a3a3a 30%, 
+    #1a1a1a 45%, 
+    #2a2a2a 60%, 
+    #1a1a1a 75%, 
+    #3a3a3a 90%, 
+    #1a1a1a 100%
+  );
+  box-shadow: 
+    inset -2px 0 4px rgba(0, 0, 0, 0.9),
+    inset 2px 0 2px rgba(255, 255, 255, 0.2),
+    2px 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.caso-card-game:active {
+  cursor: grabbing;
+}
+
+/* Estilos para drag & drop optimizados */
+.caso-card-game.dragging {
+  opacity: 0.8;
+  transform: rotate(2deg) scale(0.98);
+  cursor: grabbing;
+  z-index: 1000;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+/* Lomo durante el drag */
+.caso-card-game.dragging::before {
+  background: linear-gradient(180deg, 
+    #0a0a0a 0%, 
+    #000000 15%, 
+    #1a1a1a 30%, 
+    #000000 45%, 
+    #0a0a0a 60%, 
+    #000000 75%, 
+    #1a1a1a 90%, 
+    #000000 100%
+  );
+  box-shadow: 
+    inset -3px 0 6px rgba(0, 0, 0, 1),
+    inset 3px 0 3px rgba(255, 255, 255, 0.15),
+    3px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.caso-card-game.drag-over {
+  transform: translateY(-6px);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+/* Removed pulse animation for better performance */
+
+/* Background Image */
+.card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+/* Color Overlay - Disabled for performance */
+.card-overlay {
+  display: none;
+}
+
+/* Scan line animation disabled for performance */
+.card-overlay::before {
+  display: none;
+}
+
+@keyframes scan-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Card Content */
+.card-content {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  padding: 16px 16px 16px 28px !important; /* Padding izquierdo reducido */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #000000;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin-left: 0 !important; /* Forzar sin margen izquierdo */
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 0 !important; /* Forzar posición */
+  padding-left: 0 !important;
+}
+
+.numero-container {
+  display: flex;
+  align-items: center;
+  gap: 0; /* Sin gap ya que no hay círculo */
+  justify-content: flex-start; /* Alinear el texto a la izquierda */
+}
+
+.numero-badge-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: none !important; /* Ocultar el círculo con emoji */
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  filter: brightness(1.2) contrast(1.1);
+}
+
+.numero-text {
+  font-size: 16px;
+  font-weight: 700;
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.3px;
+  font-family: inherit;
+  color: #ffffff;
+}
+
+.tipo-badge {
+  background: transparent; /* Removido el fondo fijo para usar el dinámico */
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  align-self: flex-start;
+  backdrop-filter: none;
+  border: none;
+  font-family: inherit;
+  color: #000000 !important; /* Texto negro */
+  text-shadow: none; /* Sin sombra para texto negro */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Materia Principal con Estado */
+.materia-estado-container {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  margin: 18px 0;
+  margin-left: 0 !important; /* Forzar posición */
+  padding-left: 0 !important;
+}
+
+.materia-principal {
+  background: transparent;
+  padding: 18px 22px;
+  border-radius: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  backdrop-filter: none;
+  border: none;
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.3;
+  font-family: inherit;
+  color: #ffffff;
+}
+
+.estado-badge-lateral {
+  background: transparent; /* Removido el fondo fijo para usar el dinámico */
+  padding: 14px 18px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  backdrop-filter: none;
+  border: none;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
+  font-family: inherit;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra para mejor legibilidad */
+}
+
+/* Grid de información organizado */
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+  margin-left: 0 !important; /* Forzar posición */
+  padding-left: 0 !important;
+}
+
+.info-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.info-row .info-badge {
+  flex: 1;
+  min-width: 0;
+  max-width: 48%;
+}
+
+/* Cuando hay solo un elemento en la fila, que ocupe todo el ancho */
+.info-row .info-badge:only-child {
+  max-width: 100%;
+}
+
+/* Info Badges */
+.info-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.info-badge {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+  padding: 10px 16px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-align: left;
+  line-height: 1.3;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.info-badge.audiencia {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 1) 100%);
+  border-color: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.info-badge.observaciones {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.9) 100%);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  color: #1a365d;
+  font-style: italic;
+  box-shadow: 0 0 10px rgba(0, 150, 255, 0.2), inset 0 1px 0 rgba(0, 150, 255, 0.1);
+}
+
+.info-badge.observaciones .badge-text {
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1a365d;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.info-badge.observaciones .badge-icon {
+  color: #ffffff !important; /* Cambiar a blanco en lugar del azul anterior */
+  filter: brightness(1.2) contrast(1.1);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.info-badge.ultimo-actuado {
+  background: transparent; /* Removido el fondo fijo para usar el dinámico */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-style: normal;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra para mejor legibilidad */
+}
+
+.info-badge.ultimo-actuado .badge-text {
+  font-weight: 700;
+  line-height: 1.3;
+  color: #ffffff !important; /* Cambiar a blanco */
+  font-family: inherit;
+  font-size: inherit;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra para legibilidad */
+}
+
+.info-badge.ultimo-actuado .badge-icon {
+  color: #ffffff !important; /* Cambiar a blanco en lugar del negro anterior */
+  filter: brightness(1.2) contrast(1.1);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra negra para contraste en fondo naranja */
+}
+
+.badge-icon {
+  font-size: 12px;
+  width: 14px;
+  text-align: center;
+  filter: brightness(1.2) contrast(1.1);
+  color: #ffffff !important; /* Forzar color blanco para todos los iconos */
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.badge-text {
+  font-weight: 600;
+  text-transform: capitalize;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-family: inherit;
+  font-size: inherit;
+  color: #ffffff;
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: auto;
+  margin-left: 0 !important; /* Forzar posición */
+  padding-left: 0 !important;
+}
+
+.cliente-badge {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.8) 100%);
+  padding: 14px 20px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centrar el texto sin icono */
+  gap: 0; /* Sin gap ya que no hay icono */
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cliente-icon {
+  font-size: 16px;
+  filter: brightness(1.2) contrast(1.1);
+  color: #ffffff !important; /* Forzar color blanco */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  display: none !important; /* Ocultar el icono del cliente */
+}
+
+.cliente-text {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  color: #ffffff;
+}
+
+/* Loading and Empty States */
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.loading-icon, .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.loading-text, .empty-text {
+  font-size: 18px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .casos-container-modern {
+    padding: 16px 20px;
+  }
+  
+  .casos-grid-card {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .caso-card-game {
+    height: 280px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .casos-container-modern {
+    padding: 20px 40px;
+  }
+  
+  .casos-grid-card {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1400px) {
+  .casos-container-modern {
+    padding: 24px 50px;
+  }
+  
+  .casos-grid-card {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+}
+
+@media (min-width: 1401px) {
+  .casos-container-modern {
+    padding: 24px 80px;
+  }
+  
+  .casos-grid-card {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+}
+
+/* Estilos para mejorar la experiencia del clic derecho */
+.caso-card-game {
+  user-select: none; /* Evitar selección de texto al hacer clic derecho */
+}
+
+/* Efecto visual al hacer clic derecho */
+.caso-card-game:active {
+  transform: scale(0.98);
+}
+
+/* Cursor personalizado para indicar que se puede hacer clic derecho */
+.caso-card-game {
+  cursor: context-menu;
+}
+
+.caso-card-game:hover {
+  cursor: context-menu;
+}
+
+/* Prevenir el menú contextual del navegador en las tarjetas */
+.caso-card-game {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Efecto de feedback visual al hacer clic derecho */
+.caso-card-game.context-menu-active {
+  transform: scale(0.98);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+}
+/* Estilos específicos para juzgado y demandado con texto más pequeño */
+.info-badge.juzgado {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+  padding: 8px 12px; /* Padding reducido */
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Gap reducido */
+  font-size: 8px; /* Tamaño de fuente reducido de 9px a 8px */
+  font-weight: 500; /* Peso reducido */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-align: left;
+  line-height: 1.2; /* Line-height reducido */
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.info-badge.juzgado .badge-text {
+  font-weight: 500; /* Peso reducido de 600 a 500 */
+  text-transform: capitalize;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-family: inherit;
+  font-size: inherit;
+  color: #ffffff;
+}
+
+.info-badge.juzgado .badge-icon {
+  font-size: 10px; /* Icono más pequeño */
+  width: 12px; /* Ancho reducido */
+  text-align: center;
+  filter: brightness(1.2) contrast(1.1);
+  color: #ffffff !important; /* Forzar color blanco */
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.info-badge.demandado {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+  padding: 8px 12px; /* Padding reducido */
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Gap reducido */
+  font-size: 8px; /* Tamaño de fuente reducido de 9px a 8px */
+  font-weight: 500; /* Peso reducido */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-align: left;
+  line-height: 1.2; /* Line-height reducido */
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.info-badge.demandado .badge-text {
+  font-weight: 500; /* Peso reducido de 600 a 500 */
+  text-transform: capitalize;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-family: inherit;
+  font-size: inherit;
+  color: #ffffff;
+}
+
+.info-badge.demandado .badge-icon {
+  font-size: 10px; /* Icono más pequeño */
+  width: 12px; /* Ancho reducido */
+  text-align: center;
+  filter: brightness(1.2) contrast(1.1);
+  color: #ffffff !important; /* Forzar color blanco */
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* ========================================
+   FORZAR ICONOS BLANCOS - REGLAS AGRESIVAS
+   ======================================== */
+
+/* Forzar TODOS los iconos a ser blancos con máxima especificidad */
+.caso-card-game .badge-icon,
+.caso-card-game .cliente-icon,
+.caso-card-game .info-badge .badge-icon,
+.caso-card-game .info-badge.observaciones .badge-icon,
+.caso-card-game .info-badge.ultimo-actuado .badge-icon,
+.caso-card-game .info-badge.juzgado .badge-icon,
+.caso-card-game .info-badge.demandado .badge-icon,
+.caso-card-game .info-badge.audiencia .badge-icon,
+.caso-card-game .cliente-badge .cliente-icon,
+.caso-card-game .estado-badge-lateral .badge-icon,
+.caso-card-game span[class*="icon"],
+.caso-card-game [class*="badge"] span[class*="icon"],
+.caso-card-game [class*="badge-icon"] {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+  filter: brightness(1.2) contrast(1.1) !important;
+}
+
+/* Reglas específicas para cada tipo de badge */
+.caso-card-game .info-badge.observaciones .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+.caso-card-game .info-badge.ultimo-actuado .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8) !important; /* Sombra negra para contraste en fondo naranja */
+}
+
+.caso-card-game .info-badge.juzgado .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+.caso-card-game .info-badge.demandado .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+.caso-card-game .info-badge.audiencia .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+.caso-card-game .cliente-badge .cliente-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+.caso-card-game .estado-badge-lateral .badge-icon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Forzar iconos en cualquier elemento que contenga emojis o símbolos */
+.caso-card-game *:before,
+.caso-card-game *:after {
+  color: inherit !important;
+}
+
+/* Regla catch-all para cualquier icono que se escape */
+.caso-card-game * {
+  --icon-color: #ffffff !important;
+}
+
+.caso-card-game [class*="icon"]:not(.numero-badge-circle),
+.caso-card-game [data-icon],
+.caso-card-game .fa,
+.caso-card-game .fas,
+.caso-card-game .far,
+.caso-card-game .fal,
+.caso-card-game .fab {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}

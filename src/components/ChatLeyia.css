@@ -1,0 +1,357 @@
+/* ChatLeyia.css */
+
+.chat-leyia-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 20px;
+}
+
+.chat-leyia-container {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 600px;
+  height: 80vh;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Header */
+.chat-leyia-header {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1f2937;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.status-indicator.conectado {
+  background: #10b981;
+}
+
+.chat-leyia-close {
+  background: rgba(31, 41, 55, 0.2);
+  border: none;
+  color: #1f2937;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.chat-leyia-close:hover {
+  background: rgba(31, 41, 55, 0.3);
+  transform: scale(1.1);
+}
+
+/* Mensajes */
+.chat-leyia-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(17, 24, 39, 0.5);
+}
+
+.mensaje {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.mensaje.usuario {
+  flex-direction: row-reverse;
+}
+
+.mensaje-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-leyia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.mensaje.usuario .mensaje-avatar {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mensaje-contenido {
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.mensaje-texto {
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  margin-bottom: 4px;
+}
+
+.mensaje.ia .mensaje-texto {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-bottom-left-radius: 6px;
+}
+
+.mensaje.usuario .mensaje-texto {
+  background: rgba(75, 85, 99, 0.8);
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+
+.mensaje-hora {
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 0 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.mensaje.usuario .mensaje-hora {
+  text-align: right;
+}
+
+/* Animación de escritura */
+.mensaje-typing {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 16px;
+  border-bottom-left-radius: 6px;
+}
+
+.mensaje-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fbbf24;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.mensaje-typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.mensaje-typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* Input */
+.chat-leyia-input-container {
+  padding: 16px;
+  border-top: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(17, 24, 39, 0.8);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-leyia-input {
+  flex: 1;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: all 0.2s ease;
+  max-height: 100px;
+  min-height: 44px;
+  background: rgba(31, 41, 55, 0.8);
+  color: #fbbf24;
+}
+
+.chat-leyia-input:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+.chat-leyia-input:disabled {
+  background: rgba(31, 41, 55, 0.5);
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.chat-leyia-input::placeholder {
+  color: #9ca3af;
+}
+
+.chat-leyia-mic-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chat-leyia-mic-btn.escuchando {
+  background: #ff4444;
+  animation: pulse-recording 1.5s infinite;
+}
+
+.chat-leyia-mic-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.chat-leyia-mic-btn.escuchando:hover {
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+}
+
+.chat-leyia-mic-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes pulse-recording {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);
+  }
+}
+
+.chat-leyia-send-btn {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1f2937;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.chat-leyia-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.chat-leyia-send-btn:disabled {
+  background: #6b7280;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-leyia-overlay {
+    padding: 10px;
+  }
+  
+  .chat-leyia-container {
+    height: 90vh;
+    border-radius: 12px;
+  }
+  
+  .mensaje-contenido {
+    max-width: 85%;
+  }
+  
+  .chat-leyia-header {
+    padding: 12px 16px;
+  }
+  
+  .header-title {
+    font-size: 16px;
+  }
+}

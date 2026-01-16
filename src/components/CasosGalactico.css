@@ -1,0 +1,218 @@
+/* ========================================================================
+   CASOS GALACTICO - MAINFRAME CORPORATE EDITION (SUITS + STAR WARS)
+   ======================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --galactic-navy: #05070a;      /* Fondo Suits Profundo */
+  --header-bg: #0B1220;         /* Azul Corporativo */
+  --neon-blue: #00d2ff;         /* Holograma legal */
+  --neon-glow: 0 0 15px rgba(0, 210, 255, 0.4);
+  --suits-white: #ffffff;
+  --suits-gray: #a0aab8;
+  --accent-green: #00ff88;      /* Status Online */
+  --border-glow: rgba(0, 210, 255, 0.15);
+}
+
+/* --- CONTENEDOR MAINFRAME --- */
+.content-area.galactic-casos,
+.galactic-mainframe {
+  background-color: var(--galactic-navy) !important;
+  background-image: 
+    radial-gradient(circle at top right, rgba(0, 210, 255, 0.05), transparent),
+    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 100% 30px !important;
+  color: var(--suits-white) !important;
+  font-family: 'Inter', sans-serif !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  border: none !important;
+}
+
+/* --- HEADER SUPERIOR (SALA DE JUNTAS DE ELITE) --- */
+.content-area.galactic-casos .galactic-header,
+.galactic-mainframe .galactic-header {
+  background: var(--header-bg) !important;
+  padding: 25px 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid var(--border-glow) !important;
+  backdrop-filter: blur(20px);
+}
+
+.content-area.galactic-casos .title-area h1,
+.galactic-mainframe .title-area h1 {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.8rem !important;
+  letter-spacing: -1px !important;
+  color: var(--suits-white) !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+}
+
+.content-area.galactic-casos .title-area h1::after,
+.galactic-mainframe .title-area h1::after {
+  content: ' | CENTRAL DATABASE';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--neon-blue);
+  letter-spacing: 2px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* --- BARRA DE BÚSQUEDA (MINIMALISTA TECH) --- */
+.content-area.galactic-casos .search-bar,
+.galactic-mainframe .search-bar {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid var(--border-glow) !important;
+  padding: 10px 20px !important;
+  width: 350px !important;
+  border-radius: 2px !important;
+  transition: all 0.3s ease !important;
+}
+
+.content-area.galactic-casos .search-bar:focus-within,
+.galactic-mainframe .search-bar:focus-within {
+  border-color: var(--neon-blue) !important;
+  box-shadow: var(--neon-glow) !important;
+}
+
+.content-area.galactic-casos .search-bar input,
+.galactic-mainframe .search-bar input {
+  font-family: 'Inter', sans-serif !important;
+  color: var(--suits-white) !important;
+  font-size: 0.9rem !important;
+}
+
+/* --- BOTONES DE ACCIÓN (ESTILO HARVEY) --- */
+.content-area.galactic-casos .nav-btn,
+.galactic-mainframe .nav-btn {
+  width: 42px !important;
+  height: 42px !important;
+  background: transparent !important;
+  border: 1px solid var(--border-glow) !important;
+  color: var(--suits-white) !important;
+  border-radius: 2px !important;
+  transition: 0.2s !important;
+}
+
+.content-area.galactic-casos .nav-btn:hover,
+.galactic-mainframe .nav-btn:hover {
+  background: var(--suits-white) !important;
+  color: var(--galactic-navy) !important;
+  border-color: var(--suits-white) !important;
+}
+
+.content-area.galactic-casos .btn-plus,
+.galactic-mainframe .btn-plus {
+  background: var(--neon-blue) !important;
+  border: none !important;
+  color: var(--galactic-navy) !important;
+  font-weight: 800 !important;
+}
+
+.content-area.galactic-casos .btn-plus:hover,
+.galactic-mainframe .btn-plus:hover {
+  background: var(--suits-white) !important;
+  box-shadow: var(--neon-glow) !important;
+}
+
+/* --- PERFIL DE USUARIO --- */
+.content-area.galactic-casos .user-profile,
+.galactic-mainframe .user-profile {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--border-glow) !important;
+  border-radius: 2px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  font-size: 0.75rem !important;
+}
+
+.content-area.galactic-casos .status-light,
+.galactic-mainframe .status-light {
+  background: var(--accent-green) !important;
+  box-shadow: 0 0 10px var(--accent-green) !important;
+}
+
+/* --- GRID DE EXPEDIENTES (MODIFICADO PARA 4 COLUMNAS) --- */
+.content-area.galactic-casos .casos-grid-card,
+.galactic-mainframe .casos-grid-card {
+  background: transparent !important;
+  padding: 30px !important; /* Reducimos ligeramente el padding lateral */
+  gap: 20px !important;    /* Reducimos el espacio entre tarjetas de 30px a 20px */
+  display: grid !important;
+  /* CAMBIO CLAVE: Bajamos el mínimo de 320px a 250px */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+}
+
+/* Tarjeta específica (Placeholder si usas componentes tipo Game) */
+.content-area.galactic-casos .caso-card-game,
+.galactic-mainframe .caso-card-game {
+  background: rgba(11, 18, 32, 0.6) !important;
+  border: 1px solid var(--border-glow) !important;
+  border-radius: 4px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.content-area.galactic-casos .caso-card-game:hover,
+.galactic-mainframe .caso-card-game:hover {
+  border-color: var(--neon-blue) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: var(--neon-glow) !important;
+}
+
+/* --- ESTADOS DE CARGA (TERMINAL ANALYTICS) --- */
+.content-area.galactic-casos .loading-state {
+  color: var(--neon-blue) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  text-transform: uppercase !important;
+  letter-spacing: 4px !important;
+}
+
+.content-area.galactic-casos .loading-spinner {
+  border: 2px solid rgba(0, 210, 255, 0.1) !important;
+  border-top: 2px solid var(--neon-blue) !important;
+  box-shadow: var(--neon-glow) !important;
+}
+
+/* --- ELIMINACIÓN DE BORDES Y LIMPIEZA FINAL --- */
+.content-area.galactic-casos *,
+.galactic-mainframe * {
+  border-color: var(--border-glow);
+}
+
+/* Ocultar elementos heredados que ensucian el diseño */
+.content-area.galactic-casos .casos-header,
+.content-area.galactic-casos .topbar {
+  display: none !important;
+}
+
+/* Scrollbar Corporativo */
+.content-area.galactic-casos::-webkit-scrollbar {
+  width: 4px;
+}
+.content-area.galactic-casos::-webkit-scrollbar-thumb {
+  background: var(--border-glow);
+}
+.content-area.galactic-casos::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-blue);
+}
+
+/* --- RESPONSIVE OPTIMIZADO --- */
+@media (max-width: 768px) {
+  .content-area.galactic-casos .galactic-header {
+    padding: 20px !important;
+  }
+  .content-area.galactic-casos .search-bar {
+    width: 100% !important;
+  }
+  .content-area.galactic-casos .casos-grid-card {
+    padding: 20px !important;
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="contenciosoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#contenciosoGrad)"/>
+  <path d="M32 12L44 24H20L32 12z" fill="white"/>
+  <rect x="20" y="24" width="24" height="28" fill="white" opacity="0.9"/>
+  <path d="M24 32h16M24 36h12M24 40h16M24 44h8" stroke="#ef4444" stroke-width="2"/>
+</svg>

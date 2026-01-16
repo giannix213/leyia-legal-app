@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="laboralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#laboralGrad)"/>
+  <circle cx="32" cy="24" r="8" fill="white"/>
+  <path d="M20 52c0-6.6 5.4-12 12-12s12 5.4 12 12" fill="white"/>
+  <path d="M24 36h16v8H24z" fill="white" opacity="0.8"/>
+</svg>

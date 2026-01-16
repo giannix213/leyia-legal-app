@@ -1,0 +1,345 @@
+/* VARIABLES DE DISEÑO NEÓN */
+:root {
+  --bg-dark: #070b14;
+  --panel-bg: #0f172a;
+  --cyan-neon: #00f2ff;
+  --purple-neon: #bc13fe;
+  --emerald-neon: #00ff88;
+  --text-main: #e2e8f0;
+  --text-dim: #64748b;
+  --glow-cyan: 0 0 15px rgba(0, 242, 255, 0.4);
+  --glow-purple: 0 0 15px rgba(188, 19, 254, 0.4);
+  --glow-emerald: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+/* CONTENEDOR MAESTRO */
+.jurisprudencia-dashboard {
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HEADER Y TABS */
+.jurisprudencia-header {
+  padding: 20px 40px;
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 30px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 10px 0;
+  position: relative;
+  transition: 0.3s;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.tab.active {
+  color: var(--text-main);
+}
+
+/* EFECTO GLOW EN TABS */
+.tab-jurisprudencia.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--cyan-neon);
+  border-radius: 10px;
+  box-shadow: var(--glow-cyan);
+}
+
+.tab-criterios.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--purple-neon);
+  border-radius: 10px;
+  box-shadow: var(--glow-purple);
+}
+
+.tab-modelos.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--emerald-neon);
+  border-radius: 10px;
+  box-shadow: var(--glow-emerald);
+}
+
+.btn-new {
+  background: #1e293b;
+  color: white;
+  border: 1px solid #334155;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.btn-new:hover {
+  background: #334155;
+  transform: translateY(-2px);
+}
+
+/* LAYOUT PRINCIPAL */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* BARRA LATERAL */
+.sidebar {
+  width: 350px;
+  background: rgba(7, 11, 20, 0.3);
+  border-right: 1px solid #1e293b;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.search-box {
+  background: #070b14;
+  border: 1px solid #1e293b;
+  padding: 12px 15px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box i {
+  color: var(--text-dim);
+}
+
+.search-box input {
+  background: none;
+  border: none;
+  color: white;
+  width: 100%;
+  outline: none;
+  font-size: 14px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.search-box input::placeholder {
+  color: var(--text-dim);
+}
+
+/* TARJETAS DE ARCHIVOS CON PROGRESS GLOW */
+.doc-card {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid #1e293b;
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.doc-card:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: #334155;
+}
+
+.doc-card.active {
+  border-color: var(--cyan-neon);
+  background: rgba(0, 242, 255, 0.05);
+}
+
+.doc-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: block;
+  color: var(--text-main);
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: #070b14;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 1s ease-in-out;
+}
+
+.relevancia-text {
+  font-size: 10px;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+/* VISOR PRINCIPAL */
+.viewer {
+  flex: 1;
+  background: var(--bg-dark);
+  padding: 40px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.document-body {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+  font-size: 15px;
+  color: var(--text-dim);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* EL RECUADRO "PERTINENTE" (RATIO DECIDENDI) */
+.highlight-box {
+  position: relative;
+  margin: 40px 0;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--cyan-neon), var(--purple-neon));
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.highlight-content {
+  background: var(--bg-dark);
+  padding: 30px;
+  border-radius: 18px;
+}
+
+.label-ai {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 900;
+  color: var(--cyan-neon);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cyan-neon);
+  border-radius: 50%;
+  box-shadow: var(--glow-cyan);
+  animation: pulse 2s infinite;
+}
+
+.text-focus {
+  color: white;
+  font-size: 18px;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  line-height: 1.6;
+}
+
+.action-bar {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 0.3s;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.btn-copy {
+  background: rgba(0, 242, 255, 0.1);
+  border: 1px solid var(--cyan-neon);
+  color: var(--cyan-neon);
+}
+
+.btn-copy:hover {
+  background: var(--cyan-neon);
+  color: black;
+  box-shadow: var(--glow-cyan);
+}
+
+.btn-use {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--emerald-neon);
+  color: var(--emerald-neon);
+}
+
+.btn-use:hover {
+  background: var(--emerald-neon);
+  color: black;
+  box-shadow: var(--glow-emerald);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* SCROLLBAR PERSONALIZADO */
+.sidebar::-webkit-scrollbar,
+.viewer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.viewer::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.viewer::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.viewer::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

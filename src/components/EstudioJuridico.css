@@ -1,0 +1,336 @@
+/* ========================================================================
+   ESTUDIO JURÍDICO - VISTA ORGANIZADA POR CLIENTES CON SUB-PROCESOS
+   ======================================================================== */
+
+:root {
+  --brand-red: #e50914;
+  --bg-main: #ffffff;
+  --transition-smooth: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  --client-primary: #1e40af;
+  --client-secondary: #3b82f6;
+  --process-bg: #f8fafc;
+  --process-border: #e2e8f0;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+}
+
+/* Evita que aparezca la barra de scroll horizontal y el espacio blanco */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; 
+  font-family: 'Inter', sans-serif;
+}
+
+.netflix-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* El Wrapper ahora usa porcentajes limpios */
+.slide-wrapper {
+  display: flex;
+  width: 200%; /* Dos paneles = 200% */
+  height: calc(100vh - 80px);
+  transition: var(--transition-smooth);
+  will-change: transform;
+  transform: translateX(0%); /* Posición inicial: Panel 1 */
+}
+
+/* Cada panel ocupa exactamente la mitad del wrapper (100% de la visión) */
+.slide-panel {
+  width: 50%; 
+  height: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-main);
+}
+
+/* Clases de utilidad para mover el slider mediante JS o estados */
+.slide-wrapper.show-second {
+  transform: translateX(-50%); /* Mueve al segundo panel */
+}
+
+/* Estilo para botón de "Regresar" opcional en el header */
+.back-button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  padding: 10px;
+}
+
+/* ========================================================================
+   VISTA POR CLIENTES - ESTRUCTURA JERÁRQUICA
+   ======================================================================== */
+
+.clientes-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 140px); /* Altura fija restando header */
+  overflow-y: auto; /* Scroll vertical */
+  overflow-x: hidden; /* Sin scroll horizontal */
+}
+
+.cliente-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  border-left: 4px solid var(--client-primary);
+  transition: all 0.3s ease;
+}
+
+.cliente-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.cliente-header {
+  padding: 20px;
+  background: linear-gradient(135deg, var(--client-primary) 0%, var(--client-secondary) 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cliente-info {
+  flex: 1;
+}
+
+.cliente-nombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 5px 0;
+}
+
+.cliente-stats {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  display: flex;
+  gap: 20px;
+}
+
+.expand-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.cliente-card.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+/* Procesos del cliente */
+.procesos-container {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.cliente-card.expanded .procesos-container {
+  max-height: 1000px;
+}
+
+.proceso-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--process-border);
+  background: var(--process-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.proceso-item:hover {
+  background: #e2e8f0;
+}
+
+.proceso-item:last-child {
+  border-bottom: none;
+}
+
+.proceso-info {
+  flex: 1;
+}
+
+.proceso-numero {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.proceso-descripcion {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.proceso-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 0.8rem;
+}
+
+.proceso-tipo {
+  background: var(--client-primary);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.proceso-estado {
+  color: var(--text-secondary);
+}
+
+.proceso-prioridad {
+  font-weight: 600;
+}
+
+.proceso-prioridad.alta {
+  color: #dc2626;
+}
+
+.proceso-prioridad.media {
+  color: #d97706;
+}
+
+.proceso-prioridad.baja {
+  color: #059669;
+}
+
+.proceso-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.proceso-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.proceso-btn.primary {
+  background: var(--client-primary);
+  color: white;
+}
+
+.proceso-btn.primary:hover {
+  background: var(--client-secondary);
+}
+
+.proceso-btn.secondary {
+  background: #e5e7eb;
+  color: var(--text-primary);
+}
+
+.proceso-btn.secondary:hover {
+  background: #d1d5db;
+}
+
+/* Header de la vista */
+.estudio-header {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estudio-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.estudio-stats {
+  display: flex;
+  gap: 30px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--client-primary);
+}
+
+.stat-label {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Estados de carga y error */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+}
+
+.loading-container h2, .error-container h2 {
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.error-container p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* Scrollbar personalizado */
+.clientes-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.clientes-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.clientes-container::-webkit-scrollbar-thumb {
+  background: var(--client-primary);
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.clientes-container::-webkit-scrollbar-thumb:hover {
+  background: var(--client-secondary);
+}
+
+/* Para Firefox */
+.clientes-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--client-primary) #f1f5f9;
+}

@@ -1,0 +1,337 @@
+/* EventPopover.css - Estilos para el popover de eventos mejorado */
+
+.event-popover-container {
+  position: relative;
+  display: contents;
+}
+
+.event-popover-trigger {
+  display: contents;
+}
+
+.event-popover {
+  position: absolute;
+  z-index: 10000;
+  background: rgba(5, 5, 5, 0.95);
+  border: 2px solid #00f2ff;
+  border-radius: 8px;
+  box-shadow: 
+    0 0 20px rgba(0, 242, 255, 0.4),
+    inset 0 0 20px rgba(0, 0, 0, 0.8);
+  color: #ffffff; /* Blanco para mejor legibilidad */
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  min-width: 280px;
+  max-width: 400px;
+  transform: translateX(-50%) translateY(-100%);
+  backdrop-filter: blur(10px);
+  animation: popoverFadeIn 0.2s ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-100%) scale(1);
+  }
+}
+
+.event-popover-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #00f2ff;
+}
+
+.event-popover-arrow::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(5, 5, 5, 0.95);
+}
+
+.event-popover-header {
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-popover-date {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffffff; /* Blanco para mejor legibilidad */
+}
+
+.event-popover-count {
+  background: rgba(255, 0, 60, 0.8);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.event-popover-content {
+  padding: 8px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.event-popover-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.event-popover-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.event-popover-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 255, 0.5);
+  border-radius: 2px;
+}
+
+.event-popover-item {
+  padding: 8px 16px;
+  border-left: 4px solid #00f2ff;
+  margin: 4px 0;
+  background: rgba(0, 242, 255, 0.05);
+  transition: background 0.2s ease;
+}
+
+.event-popover-item:hover {
+  background: rgba(0, 242, 255, 0.1);
+}
+
+.event-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.event-item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.event-popover-item:hover .event-item-actions {
+  opacity: 1;
+}
+
+.event-action-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.event-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.event-action-btn.edit-btn:hover {
+  background: rgba(255, 165, 0, 0.8);
+  border-color: #ffa500;
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
+}
+
+.event-action-btn.delete-btn:hover {
+  background: rgba(255, 0, 60, 0.8);
+  border-color: #ff003c;
+  box-shadow: 0 0 8px rgba(255, 0, 60, 0.5);
+}
+
+.event-item-icon {
+  font-size: 1rem;
+}
+
+.event-item-time {
+  background: rgba(0, 242, 255, 0.2);
+  color: #ffffff; /* Blanco para mejor legibilidad */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.event-item-priority {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.event-item-priority.priority-alta {
+  background: #ef4444;
+  color: white;
+}
+
+.event-item-priority.priority-media {
+  background: #f59e0b;
+  color: white;
+}
+
+.event-item-priority.priority-baja {
+  background: #10b981;
+  color: white;
+}
+
+.event-item-title {
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.event-item-case,
+.event-item-client,
+.event-item-location,
+.event-item-judge {
+  font-size: 0.7rem;
+  color: #e0e0e0; /* Gris claro para mejor legibilidad */
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.event-item-case {
+  color: #ffa500;
+}
+
+.event-item-client {
+  color: #10b981;
+}
+
+.event-item-location {
+  color: #f59e0b;
+}
+
+.event-item-judge {
+  color: #8b5cf6;
+}
+
+.event-popover-more {
+  padding: 8px 16px;
+  text-align: center;
+  color: #e0e0e0; /* Gris claro para mejor legibilidad */
+  font-style: italic;
+  border-top: 1px solid rgba(0, 242, 255, 0.2);
+  background: rgba(0, 242, 255, 0.05);
+}
+
+.event-popover-footer {
+  padding: 8px 16px;
+  border-top: 1px solid rgba(0, 242, 255, 0.3);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.event-popover-footer small {
+  color: #e0e0e0; /* Gris claro para mejor legibilidad */
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .event-popover {
+    min-width: 250px;
+    max-width: 90vw;
+    font-size: 0.7rem;
+  }
+  
+  .event-popover-header {
+    padding: 10px 12px 6px;
+  }
+  
+  .event-popover-item {
+    padding: 6px 12px;
+  }
+  
+  .event-item-header {
+    gap: 6px;
+  }
+  
+  .event-popover-footer {
+    padding: 6px 12px;
+  }
+}
+
+/* Animación de hover para elementos interactivos */
+.event-popover-item {
+  cursor: pointer;
+}
+
+.event-popover-item:hover .event-item-title {
+  color: #00f2ff;
+  text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+}
+
+/* Efectos especiales para diferentes tipos de eventos */
+.event-popover-item[data-tipo="audiencia"] {
+  border-left-color: #3b82f6;
+}
+
+.event-popover-item[data-tipo="reunion"] {
+  border-left-color: #10b981;
+}
+
+.event-popover-item[data-tipo="vencimiento"] {
+  border-left-color: #ef4444;
+}
+
+.event-popover-item[data-tipo="cita"] {
+  border-left-color: #f59e0b;
+}
+
+.event-popover-item[data-tipo="recordatorio"] {
+  border-left-color: #8b5cf6;
+}
+
+.event-popover-item[data-tipo="tarea"] {
+  border-left-color: #ffa500;
+  background: rgba(255, 165, 0, 0.05);
+}
+
+.event-popover-item[data-tipo="tarea"]:hover {
+  background: rgba(255, 165, 0, 0.1);
+}

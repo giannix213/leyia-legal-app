@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tributarioGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#tributarioGrad)"/>
+  <circle cx="32" cy="32" r="16" fill="white" opacity="0.2"/>
+  <path d="M32 20v24M20 32h24" stroke="white" stroke-width="3"/>
+  <text x="32" y="38" text-anchor="middle" fill="white" font-size="16" font-weight="bold">$</text>
+</svg>

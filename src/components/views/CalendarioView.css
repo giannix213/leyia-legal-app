@@ -1,0 +1,1451 @@
+/* CalendarioView.css - Estilos futuristas para el calendario estilo terminal galáctica */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+/* Variables CSS para el tema futurista con mejor legibilidad */
+:root {
+  --star-blue: #00f2ff;
+  --deep-space: #050505;
+  --panel-bg: rgba(10, 10, 10, 0.9);
+  --danger-red: #ff003c;
+  --grid-color: rgba(0, 242, 255, 0.05);
+  --border-color: #00f2ff;
+  --text-primary: #ffffff;        /* Cambiado a blanco para mejor legibilidad */
+  --text-secondary: #e0e0e0;      /* Gris claro para texto secundario */
+  --text-accent: #00f2ff;         /* Azul para acentos */
+  --bg-hover: rgba(0, 242, 255, 0.1);
+  --shadow-glow: 0 0 20px rgba(0, 242, 255, 0.2);
+}
+
+/* RESET COMPLETO PARA EL CALENDARIO - Sobrescribir todos los estilos globales */
+.calendario-futurista,
+.calendario-futurista *,
+.calendario-futurista *::before,
+.calendario-futurista *::after {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  color: inherit !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  text-decoration: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Contenedor principal del calendario futurista */
+.calendario-futurista {
+  width: 100% !important;
+  min-height: 100vh !important;
+  background-color: var(--deep-space) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  padding: 20px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Ajuste para cuando se usa con sidebar */
+.main-content.sidebar-visible .calendario-futurista,
+.main-content.sidebar-compressed .calendario-futurista {
+  padding-left: 40px !important;
+}
+
+/* Efecto de rejilla de fondo con animación */
+.calendario-futurista .grid-background {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) !important;
+  background-size: 30px 30px !important;
+  z-index: -1 !important;
+  animation: gridPulse 4s ease-in-out infinite !important;
+}
+
+@keyframes gridPulse {
+  0%, 100% { 
+    opacity: 0.3;
+    background-size: 30px 30px;
+  }
+  50% { 
+    opacity: 0.6;
+    background-size: 32px 32px;
+  }
+}
+
+/* Contenedor principal del calendario */
+.calendario-futurista .calendar-container {
+  width: 90% !important;
+  max-width: 1000px !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-glow), inset 0 0 20px rgba(0,0,0,0.8) !important;
+  padding: 20px !important;
+  position: relative !important;
+  border-radius: 5px !important;
+}
+
+/* Línea de escaneo holográfico */
+.calendario-futurista .scanline {
+  width: 100% !important;
+  height: 2px !important;
+  background: rgba(0, 242, 255, 0.1) !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  animation: scan 4s linear infinite !important;
+  z-index: 2 !important;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Decoraciones del sistema */
+.calendario-futurista .decoration {
+  position: absolute !important;
+  font-size: 0.6rem !important;
+  opacity: 0.5 !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  color: var(--text-primary) !important;
+}
+
+.calendario-futurista .decoration.top-right {
+  top: 5px !important;
+  right: 10px !important;
+}
+
+.calendario-futurista .decoration.bottom-left {
+  bottom: 5px !important;
+  left: 10px !important;
+}
+
+/* Header del calendario */
+.calendario-futurista .header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  border-bottom: 4px solid var(--danger-red) !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 20px !important;
+}
+
+.calendario-futurista .header-left small {
+  display: block !important;
+  font-size: 0.7rem !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: 5px !important;
+}
+
+.calendario-futurista .header h1 {
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 2.5rem !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 5px !important;
+  text-shadow: 0 0 10px var(--text-accent) !important;
+  color: var(--text-primary) !important; /* Blanco para mejor legibilidad */
+}
+
+.calendario-futurista .system-status {
+  text-align: right !important;
+  font-size: 0.8rem !important;
+  color: var(--text-accent) !important; /* Azul para el estado del sistema */
+  line-height: 1.4 !important;
+}
+
+/* Controles de navegación mejorados */
+.calendario-futurista .calendar-controls {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 20px !important;
+  margin-bottom: 20px !important;
+  flex-wrap: wrap !important;
+  padding: 15px !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(0, 242, 255, 0.2) !important;
+  border-radius: 8px !important;
+}
+
+.calendario-futurista .nav-controls,
+.calendario-futurista .view-controls,
+.calendario-futurista .action-controls {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+.calendario-futurista .nav-btn {
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important; /* Blanco para mejor legibilidad */
+  padding: 8px 16px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  border-radius: 3px !important;
+}
+
+.calendario-futurista .nav-btn:hover {
+  background: var(--bg-hover) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.5) !important;
+  transform: scale(1.05) !important;
+  color: var(--text-accent) !important; /* Azul al hacer hover */
+}
+
+.calendario-futurista .today-btn {
+  background: var(--border-color) !important;
+  color: var(--deep-space) !important;
+  font-weight: bold !important;
+}
+
+.calendario-futurista .new-event-btn {
+  background: var(--danger-red) !important;
+  border-color: var(--danger-red) !important;
+  color: white !important;
+}
+
+.calendario-futurista .new-event-btn:hover {
+  background: rgba(255, 0, 60, 0.8) !important;
+  box-shadow: 0 0 10px rgba(255, 0, 60, 0.5) !important;
+}
+
+/* Botones de vista */
+.calendario-futurista .view-btn {
+  background: transparent !important;
+  border: 1px solid rgba(0, 242, 255, 0.5) !important;
+  color: var(--text-secondary) !important;
+  padding: 8px 16px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  border-radius: 3px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.calendario-futurista .view-btn:hover {
+  background: rgba(0, 242, 255, 0.1) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  transform: scale(1.05) !important;
+}
+
+.calendario-futurista .view-btn.active {
+  background: var(--border-color) !important;
+  color: var(--deep-space) !important;
+  border-color: var(--border-color) !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.5) !important;
+}
+
+/* Tabla del calendario */
+.calendario-futurista .calendar-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 20px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+.calendario-futurista .calendar-table th {
+  color: var(--text-primary) !important; /* Blanco para días de la semana */
+  padding: 10px !important;
+  font-family: 'Orbitron', sans-serif !important;
+  text-transform: uppercase !important;
+  font-size: 0.9rem !important;
+  border-bottom: 1px solid #333 !important;
+  text-align: center !important;
+  background: none !important;
+  font-weight: bold !important;
+}
+.calendario-futurista .calendar-table td {
+  padding: 15px 8px !important;
+  text-align: center !important;
+  border: 1px solid #1a1a1a !important;
+  transition: all 0.3s ease !important;
+  cursor: crosshair !important;
+  position: relative !important;
+  height: 80px !important;
+  vertical-align: top !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: var(--text-primary) !important; /* Blanco para números de días */
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+.calendario-futurista .calendar-table td:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important; /* Mantener blanco al hacer hover */
+  box-shadow: 
+    inset 0 0 10px rgba(0, 242, 255, 0.5),
+    0 0 20px rgba(0, 242, 255, 0.3) !important;
+  transform: scale(1.02) !important;
+  border-color: rgba(0, 242, 255, 0.7) !important;
+}
+
+.calendario-futurista .calendar-table td.other-month {
+  color: #666 !important; /* Gris más claro para días de otros meses */
+  opacity: 0.5 !important;
+}
+
+.calendario-futurista .calendar-table td.other-month:hover {
+  opacity: 0.8 !important;
+}
+
+.calendario-futurista .calendar-table td.today {
+  background: var(--border-color) !important;
+  color: var(--deep-space) !important; /* Negro sobre fondo azul */
+  font-weight: bold !important;
+  box-shadow: 0 0 15px var(--border-color) !important;
+}
+
+.calendario-futurista .calendar-table td.today:hover {
+  box-shadow: 
+    0 0 25px var(--border-color),
+    inset 0 0 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.calendario-futurista .calendar-table td.has-events {
+  border-color: var(--border-color) !important;
+  box-shadow: inset 0 0 8px rgba(0, 242, 255, 0.4) !important;
+  position: relative !important;
+}
+
+.calendario-futurista .calendar-table td.has-events::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: radial-gradient(circle at center, rgba(0, 242, 255, 0.1) 0%, transparent 70%) !important;
+  pointer-events: none !important;
+  animation: dayGlow 4s ease-in-out infinite !important;
+}
+
+@keyframes dayGlow {
+  0%, 100% { 
+    opacity: 0.3;
+  }
+  50% { 
+    opacity: 0.6;
+  }
+}
+
+.calendario-futurista .calendar-table td.has-events:hover {
+  box-shadow: 
+    inset 0 0 15px rgba(0, 242, 255, 0.6),
+    0 0 25px rgba(0, 242, 255, 0.4) !important;
+}
+
+.calendario-futurista .calendar-table td.has-events:hover::before {
+  animation: none !important;
+  opacity: 0.8 !important;
+}
+
+/* Número del día */
+.calendario-futurista .dia-numero {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  margin-bottom: 5px !important;
+  color: inherit !important;
+}
+
+/* Indicadores de eventos mejorados */
+.calendario-futurista .eventos-indicator {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 3px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 5px !important;
+  min-height: 20px !important;
+}
+
+.calendario-futurista .evento-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 
+    0 0 4px rgba(0, 0, 0, 0.5),
+    inset 0 0 2px rgba(255, 255, 255, 0.3) !important;
+  position: relative !important;
+  animation: eventPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes eventPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.calendario-futurista .evento-dot:hover {
+  transform: scale(1.6) !important;
+  box-shadow: 
+    0 0 12px currentColor,
+    inset 0 0 4px rgba(255, 255, 255, 0.5) !important;
+  z-index: 10 !important;
+  animation: none !important;
+}
+
+.calendario-futurista .mas-eventos {
+  font-size: 0.65rem !important;
+  color: var(--text-primary) !important;
+  background: var(--danger-red) !important;
+  padding: 1px 4px !important;
+  border-radius: 8px !important;
+  margin-top: 2px !important;
+  font-weight: bold !important;
+  min-width: 16px !important;
+  text-align: center !important;
+  box-shadow: 0 0 6px rgba(255, 0, 60, 0.5) !important;
+}
+
+/* Efecto de brillo optimizado para días con eventos */
+.calendario-futurista .calendar-table td.glow-effect {
+  box-shadow: 
+    inset 0 0 10px rgba(0, 242, 255, 0.5),
+    0 0 15px rgba(0, 242, 255, 0.3) !important;
+  border: 2px solid rgba(0, 242, 255, 0.7) !important;
+  animation: pulseGlow 3s ease-in-out infinite !important;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 
+      inset 0 0 10px rgba(0, 242, 255, 0.5),
+      0 0 15px rgba(0, 242, 255, 0.3) !important;
+    border-color: rgba(0, 242, 255, 0.7) !important;
+  }
+  50% { 
+    box-shadow: 
+      inset 0 0 20px rgba(0, 242, 255, 0.8),
+      0 0 25px rgba(0, 242, 255, 0.6) !important;
+    border-color: rgba(0, 242, 255, 1) !important;
+  }
+}
+
+/* Estilos diferenciados para tareas vs audiencias */
+.calendario-futurista .evento-dot.tarea-dot {
+  border: 2px solid #fff !important;
+  box-shadow: 
+    0 0 8px currentColor,
+    inset 0 0 3px rgba(255, 255, 255, 0.4) !important;
+  position: relative !important;
+}
+
+.calendario-futurista .evento-dot.tarea-dot::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 4px !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-radius: 50% !important;
+}
+
+.calendario-futurista .evento-dot.audiencia-dot {
+  border: 2px solid rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 
+    0 0 6px currentColor,
+    inset 0 0 2px rgba(255, 255, 255, 0.2) !important;
+  position: relative !important;
+}
+
+.calendario-futurista .evento-dot.audiencia-dot::after {
+  content: '⚖' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  font-size: 6px !important;
+  color: rgba(0, 0, 0, 0.7) !important;
+  line-height: 1 !important;
+}
+
+/* Indicador de número de eventos en el día mejorado */
+.calendario-futurista .calendar-table td[data-eventos]::after {
+  content: attr(data-eventos) !important;
+  position: absolute !important;
+  top: 3px !important;
+  right: 3px !important;
+  background: linear-gradient(135deg, var(--danger-red), #ff4d6d) !important;
+  color: white !important;
+  font-size: 0.65rem !important;
+  padding: 2px 5px !important;
+  border-radius: 10px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: bold !important;
+  text-shadow: none !important;
+  box-shadow: 
+    0 0 8px rgba(255, 0, 60, 0.6),
+    inset 0 0 2px rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  animation: badgePulse 3s ease-in-out infinite !important;
+}
+
+@keyframes badgePulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 
+      0 0 8px rgba(255, 0, 60, 0.6),
+      inset 0 0 2px rgba(255, 255, 255, 0.3);
+  }
+  50% { 
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 12px rgba(255, 0, 60, 0.8),
+      inset 0 0 3px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.calendario-futurista .calendar-table td[data-eventos="0"]::after {
+  display: none !important;
+}
+
+/* Tooltip mejorado para eventos */
+.calendario-futurista .calendar-table td {
+  position: relative !important;
+}
+
+.calendario-futurista .calendar-table td:hover::before {
+  content: attr(title) !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: var(--text-primary) !important; /* Blanco para mejor legibilidad */
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  font-size: 0.7rem !important;
+  white-space: pre-line !important;
+  z-index: 1000 !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.5) !important;
+  max-width: 200px !important;
+  word-wrap: break-word !important;
+}
+
+/* Estilos para vista semanal (preparación futura) */
+.calendario-futurista .vista-semanal {
+  display: none !important; /* Por ahora oculto, se activará cuando implementes la vista semanal */
+}
+
+.calendario-futurista .tareas-semana {
+  background: rgba(255, 165, 0, 0.1) !important;
+  border: 1px solid #ffa500 !important;
+  padding: 10px !important;
+  margin-top: 20px !important;
+  border-radius: 5px !important;
+}
+
+.calendario-futurista .tareas-semana h3 {
+  color: #ffa500 !important;
+  font-family: 'Orbitron', sans-serif !important;
+  text-transform: uppercase !important;
+  margin-bottom: 10px !important;
+}
+
+.calendario-futurista .tarea-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 5px 0 !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+.calendario-futurista .tarea-item:last-child {
+  border-bottom: none !important;
+}
+
+.calendario-futurista .tarea-prioridad {
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  font-size: 0.6rem !important;
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+}
+
+.calendario-futurista .tarea-prioridad.alta {
+  background: var(--danger-red) !important;
+  color: white !important;
+}
+
+.calendario-futurista .tarea-prioridad.media {
+  background: #ffa500 !important;
+  color: white !important;
+}
+
+.calendario-futurista .tarea-prioridad.baja {
+  background: #4caf50 !important;
+  color: white !important;
+}
+.modal-overlay.futurista {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 10000 !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.calendario-futurista .modal-evento.futurista,
+.calendario-futurista .modal-nuevo-evento.futurista,
+.calendario-futurista .modal-editar-evento.futurista,
+.calendario-futurista .modal-eliminar-evento.futurista {
+  background: var(--panel-bg) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 5px !important;
+  box-shadow: var(--shadow-glow), inset 0 0 20px rgba(0,0,0,0.8) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  position: relative !important;
+  max-width: 600px !important;
+  width: 90% !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
+
+/* Header de modales */
+.calendario-futurista .modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 20px !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  background: rgba(0, 242, 255, 0.1) !important;
+}
+
+.calendario-futurista .modal-header.eliminar {
+  border-bottom-color: var(--danger-red) !important;
+  background: rgba(255, 0, 60, 0.1) !important;
+}
+
+.calendario-futurista .modal-header h2 {
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 1.5rem !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  text-shadow: 0 0 10px currentColor !important;
+  color: var(--text-primary) !important; /* Blanco para títulos de modales */
+}
+
+.calendario-futurista .btn-cerrar {
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important; /* Blanco para botón cerrar */
+  font-size: 1.5rem !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.calendario-futurista .btn-cerrar:hover {
+  background: var(--danger-red) !important;
+  border-color: var(--danger-red) !important;
+  color: white !important;
+  transform: rotate(90deg) !important;
+}
+
+/* Cuerpo de modales */
+.calendario-futurista .modal-body {
+  padding: 20px !important;
+}
+
+/* Información del evento */
+.calendario-futurista .evento-info {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 15px !important;
+}
+
+.calendario-futurista .info-item {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.calendario-futurista .info-item.full-width {
+  grid-column: 1 / -1 !important;
+}
+
+.calendario-futurista .info-label {
+  font-size: 0.8rem !important;
+  color: var(--text-accent) !important; /* Azul para etiquetas */
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.calendario-futurista .info-value {
+  font-size: 1rem !important;
+  color: var(--text-primary) !important; /* Blanco para valores */
+  font-weight: bold !important;
+}
+
+/* Badge de prioridad en modal */
+.calendario-futurista .priority-badge {
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  font-size: 0.8rem !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+}
+
+.calendario-futurista .priority-badge.priority-alta {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.calendario-futurista .priority-badge.priority-media {
+  background: #f59e0b !important;
+  color: white !important;
+}
+
+.calendario-futurista .priority-badge.priority-baja {
+  background: #10b981 !important;
+  color: white !important;
+}
+
+/* Formularios */
+.calendario-futurista .form-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 15px !important;
+}
+
+.calendario-futurista .form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.calendario-futurista .form-group.full-width {
+  grid-column: 1 / -1 !important;
+}
+
+.calendario-futurista .form-group label {
+  font-size: 0.8rem !important;
+  color: var(--text-accent) !important; /* Azul para etiquetas de formulario */
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-weight: bold !important;
+}
+
+.calendario-futurista .form-group input,
+.calendario-futurista .form-group select,
+.calendario-futurista .form-group textarea {
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important; /* Blanco para texto de inputs */
+  padding: 10px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.9rem !important;
+  border-radius: 3px !important;
+  transition: all 0.3s ease !important;
+}
+
+.calendario-futurista .form-group input:focus,
+.calendario-futurista .form-group select:focus,
+.calendario-futurista .form-group textarea:focus {
+  outline: none !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.5) !important;
+  background: rgba(0, 242, 255, 0.1) !important;
+  color: var(--text-primary) !important; /* Mantener blanco al enfocar */
+}
+
+.calendario-futurista .form-group textarea {
+  resize: vertical !important;
+  min-height: 80px !important;
+}
+
+/* Footer de modales */
+.calendario-futurista .modal-footer {
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: flex-end !important;
+  padding: 20px !important;
+  border-top: 1px solid #333 !important;
+}
+
+.calendario-futurista .btn-modal {
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important; /* Blanco para botones */
+  padding: 10px 20px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  border-radius: 3px !important;
+  font-weight: bold !important;
+}
+
+.calendario-futurista .btn-modal:hover {
+  background: var(--bg-hover) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.5) !important;
+  transform: scale(1.05) !important;
+  color: var(--text-accent) !important; /* Azul al hacer hover */
+}
+
+.calendario-futurista .btn-modal.guardar,
+.calendario-futurista .btn-modal.actualizar {
+  background: var(--border-color) !important;
+  color: var(--deep-space) !important; /* Negro sobre fondo azul */
+  border-color: var(--border-color) !important;
+}
+
+.calendario-futurista .btn-modal.eliminar,
+.calendario-futurista .btn-modal.eliminar-confirmar {
+  background: var(--danger-red) !important;
+  color: white !important;
+  border-color: var(--danger-red) !important;
+}
+
+.calendario-futurista .btn-modal.eliminar:hover,
+.calendario-futurista .btn-modal.eliminar-confirmar:hover {
+  background: rgba(255, 0, 60, 0.8) !important;
+  box-shadow: 0 0 10px rgba(255, 0, 60, 0.5) !important;
+  color: white !important; /* Mantener blanco en botones de eliminar */
+}
+
+.calendario-futurista .btn-modal.editar {
+  background: #ffa500 !important;
+  color: var(--deep-space) !important; /* Negro sobre fondo naranja */
+  border-color: #ffa500 !important;
+}
+
+.calendario-futurista .btn-modal.editar:hover {
+  background: rgba(255, 165, 0, 0.8) !important;
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.5) !important;
+  color: var(--deep-space) !important; /* Mantener negro en botón editar */
+}
+
+.calendario-futurista .btn-modal:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Estilos específicos para modal de eliminación */
+.calendario-futurista .warning-message {
+  background: rgba(255, 0, 60, 0.1) !important;
+  border: 1px solid var(--danger-red) !important;
+  color: var(--text-primary) !important; /* Blanco para mejor legibilidad */
+  padding: 15px !important;
+  border-radius: 3px !important;
+  text-align: center !important;
+  font-weight: bold !important;
+  margin-bottom: 20px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.calendario-futurista .evento-preview {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #333 !important;
+  padding: 15px !important;
+  border-radius: 3px !important;
+  margin-bottom: 20px !important;
+}
+
+.calendario-futurista .preview-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 5px !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+.calendario-futurista .preview-item:last-child {
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+.calendario-futurista .preview-label {
+  font-size: 0.8rem !important;
+  color: var(--text-accent) !important; /* Azul para etiquetas */
+  text-transform: uppercase !important;
+}
+
+.calendario-futurista .preview-value {
+  color: var(--text-primary) !important; /* Blanco para valores */
+  font-weight: bold !important;
+}
+
+.calendario-futurista .confirmation-message {
+  text-align: center !important;
+  color: var(--text-primary) !important; /* Blanco para mensaje de confirmación */
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Animaciones adicionales */
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(0, 242, 255, 0.5) !important; 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.8) !important; 
+  }
+}
+
+.calendario-futurista .calendar-table td.today {
+  animation: glow 2s ease-in-out infinite !important;
+}
+
+/* Menú contextual */
+.context-menu {
+  background: rgba(5, 5, 5, 0.95) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 
+    0 0 20px rgba(0, 242, 255, 0.4),
+    inset 0 0 20px rgba(0, 0, 0, 0.8) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  min-width: 200px !important;
+  backdrop-filter: blur(10px) !important;
+  animation: contextMenuFadeIn 0.2s ease-out !important;
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.context-menu-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid rgba(0, 242, 255, 0.3) !important;
+  background: rgba(0, 242, 255, 0.1) !important;
+  font-weight: bold !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  color: var(--text-accent) !important;
+}
+
+.context-menu-item {
+  width: 100% !important;
+  padding: 10px 16px !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-primary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.8rem !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.context-menu-item:hover {
+  background: rgba(0, 242, 255, 0.1) !important;
+  color: var(--text-accent) !important;
+}
+
+.context-menu-separator {
+  height: 1px !important;
+  background: rgba(0, 242, 255, 0.2) !important;
+  margin: 4px 0 !important;
+}
+
+.context-menu-subtitle {
+  padding: 8px 16px 4px !important;
+  font-size: 0.7rem !important;
+  color: var(--text-secondary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.context-menu-event {
+  padding: 8px 16px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  transition: background 0.2s ease !important;
+}
+
+.context-menu-event:hover {
+  background: rgba(0, 242, 255, 0.05) !important;
+}
+
+.context-menu-event-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 !important;
+}
+
+.context-menu-event-time {
+  font-size: 0.6rem !important;
+  color: var(--text-accent) !important;
+  background: rgba(0, 242, 255, 0.2) !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  width: fit-content !important;
+}
+
+.context-menu-event-title {
+  font-size: 0.7rem !important;
+  color: var(--text-primary) !important;
+  font-weight: bold !important;
+}
+
+.context-menu-event-actions {
+  display: flex !important;
+  gap: 4px !important;
+}
+
+.context-menu-action {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.6rem !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+}
+
+.context-menu-action:hover {
+  transform: scale(1.1) !important;
+}
+
+.context-menu-action.edit:hover {
+  background: rgba(255, 165, 0, 0.8) !important;
+  border-color: #ffa500 !important;
+  box-shadow: 0 0 6px rgba(255, 165, 0, 0.5) !important;
+}
+
+.context-menu-action.delete:hover {
+  background: rgba(255, 0, 60, 0.8) !important;
+  border-color: #ff003c !important;
+  box-shadow: 0 0 6px rgba(255, 0, 60, 0.5) !important;
+}
+
+.context-menu-more {
+  padding: 8px 16px !important;
+  font-size: 0.7rem !important;
+  color: var(--text-secondary) !important;
+  font-style: italic !important;
+  text-align: center !important;
+  border-top: 1px solid rgba(0, 242, 255, 0.2) !important;
+}
+@media (max-width: 768px) {
+  .calendario-futurista .calendar-container {
+    width: 95% !important;
+    padding: 15px !important;
+  }
+  
+  .calendario-futurista .header h1 {
+    font-size: 1.8rem !important;
+    letter-spacing: 3px !important;
+  }
+  
+  .calendario-futurista .calendar-controls {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  .calendario-futurista .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .calendario-futurista .evento-info {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .calendario-futurista .calendar-table td {
+    padding: 8px 4px !important;
+    height: 60px !important;
+  }
+  
+  .calendario-futurista .dia-numero {
+    font-size: 1rem !important;
+  }
+  
+  /* Puntos de eventos más grandes en móvil */
+  .calendario-futurista .evento-dot {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  .calendario-futurista .eventos-indicator {
+    gap: 4px !important;
+    min-height: 24px !important;
+  }
+  
+  .calendario-futurista .mas-eventos {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendario-futurista .calendar-container {
+    width: 98% !important;
+    padding: 10px !important;
+  }
+  
+  .calendario-futurista .header {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 10px !important;
+  }
+  
+  .calendario-futurista .system-status {
+    text-align: center !important;
+  }
+  
+  .calendario-futurista .calendar-table th,
+  .calendario-futurista .calendar-table td {
+    padding: 5px 2px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .calendario-futurista .calendar-table td {
+    height: 50px !important;
+  }
+}
+
+/* Vista Semanal */
+.calendario-futurista .week-view {
+  width: 100% !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.calendario-futurista .week-header {
+  display: grid !important;
+  grid-template-columns: 80px repeat(7, 1fr) !important;
+  background: rgba(0, 242, 255, 0.1) !important;
+  border-bottom: 2px solid var(--border-color) !important;
+}
+
+.calendario-futurista .time-column {
+  padding: 15px 10px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  color: var(--text-accent) !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  font-size: 0.8rem !important;
+  text-align: center !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+.calendario-futurista .day-column {
+  padding: 15px 10px !important;
+  text-align: center !important;
+  border-right: 1px solid rgba(0, 242, 255, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.calendario-futurista .day-column:last-child {
+  border-right: none !important;
+}
+
+.calendario-futurista .day-column.today {
+  background: rgba(0, 242, 255, 0.2) !important;
+  box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.3) !important;
+}
+
+.calendario-futurista .day-name {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: bold !important;
+  color: var(--text-primary) !important;
+  font-size: 0.9rem !important;
+  text-transform: uppercase !important;
+  margin-bottom: 5px !important;
+}
+
+.calendario-futurista .day-number {
+  font-size: 1.4rem !important;
+  font-weight: bold !important;
+  color: var(--text-accent) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  margin-bottom: 5px !important;
+}
+
+.calendario-futurista .day-events-count {
+  font-size: 0.7rem !important;
+  color: var(--text-secondary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.calendario-futurista .week-body {
+  max-height: 600px !important;
+  overflow-y: auto !important;
+}
+
+.calendario-futurista .week-body::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.calendario-futurista .week-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.calendario-futurista .week-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 255, 0.5) !important;
+  border-radius: 3px !important;
+}
+
+.calendario-futurista .time-row {
+  display: grid !important;
+  grid-template-columns: 80px repeat(7, 1fr) !important;
+  border-bottom: 1px solid rgba(0, 242, 255, 0.1) !important;
+  min-height: 60px !important;
+}
+
+.calendario-futurista .time-row:nth-child(even) {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.calendario-futurista .time-label {
+  padding: 10px !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-secondary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.7rem !important;
+  text-align: center !important;
+  border-right: 1px solid var(--border-color) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.calendario-futurista .time-cell {
+  padding: 5px !important;
+  border-right: 1px solid rgba(0, 242, 255, 0.1) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  min-height: 60px !important;
+}
+
+.calendario-futurista .time-cell:last-child {
+  border-right: none !important;
+}
+
+.calendario-futurista .time-cell:hover {
+  background: rgba(0, 242, 255, 0.05) !important;
+}
+
+.calendario-futurista .time-cell.today {
+  background: rgba(0, 242, 255, 0.08) !important;
+}
+
+.calendario-futurista .week-event {
+  background: rgba(0, 242, 255, 0.1) !important;
+  border: 1px solid rgba(0, 242, 255, 0.3) !important;
+  border-left: 4px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  padding: 6px 8px !important;
+  margin: 2px 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  font-size: 0.7rem !important;
+}
+
+.calendario-futurista .week-event:hover {
+  background: rgba(0, 242, 255, 0.2) !important;
+  transform: scale(1.02) !important;
+  box-shadow: 0 0 8px rgba(0, 242, 255, 0.3) !important;
+}
+
+.calendario-futurista .week-event.tarea-event {
+  background: rgba(255, 165, 0, 0.1) !important;
+  border-color: rgba(255, 165, 0, 0.3) !important;
+}
+
+.calendario-futurista .week-event.tarea-event:hover {
+  background: rgba(255, 165, 0, 0.2) !important;
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.3) !important;
+}
+
+.calendario-futurista .event-time {
+  font-weight: bold !important;
+  color: var(--text-accent) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.6rem !important;
+  margin-bottom: 2px !important;
+}
+
+.calendario-futurista .event-title {
+  color: var(--text-primary) !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin-bottom: 2px !important;
+  font-size: 0.7rem !important;
+}
+
+.calendario-futurista .event-case {
+  color: var(--text-secondary) !important;
+  font-size: 0.6rem !important;
+  margin-bottom: 4px !important;
+}
+
+.calendario-futurista .event-actions-week {
+  display: flex !important;
+  gap: 4px !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  position: absolute !important;
+  top: 2px !important;
+  right: 4px !important;
+}
+
+.calendario-futurista .week-event:hover .event-actions-week {
+  opacity: 1 !important;
+}
+
+.calendario-futurista .event-actions-week .event-action-btn {
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.6rem !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+}
+
+.calendario-futurista .event-actions-week .event-action-btn:hover {
+  transform: scale(1.1) !important;
+}
+
+.calendario-futurista .event-actions-week .event-action-btn.edit:hover {
+  background: rgba(255, 165, 0, 0.8) !important;
+  border-color: #ffa500 !important;
+}
+
+.calendario-futurista .event-actions-week .event-action-btn.delete:hover {
+  background: rgba(255, 0, 60, 0.8) !important;
+  border-color: #ff003c !important;
+}
+
+/* Responsive para vista semanal */
+@media (max-width: 768px) {
+  .calendario-futurista .week-header {
+    grid-template-columns: 60px repeat(7, 1fr) !important;
+  }
+  
+  .calendario-futurista .time-row {
+    grid-template-columns: 60px repeat(7, 1fr) !important;
+  }
+  
+  .calendario-futurista .time-column,
+  .calendario-futurista .time-label {
+    padding: 8px 4px !important;
+    font-size: 0.6rem !important;
+  }
+  
+  .calendario-futurista .day-column {
+    padding: 10px 5px !important;
+  }
+  
+  .calendario-futurista .day-name {
+    font-size: 0.7rem !important;
+  }
+  
+  .calendario-futurista .day-number {
+    font-size: 1.1rem !important;
+  }
+  
+  .calendario-futurista .day-events-count {
+    font-size: 0.6rem !important;
+  }
+  
+  .calendario-futurista .week-event {
+    padding: 4px 6px !important;
+    font-size: 0.6rem !important;
+  }
+  
+  .calendario-futurista .event-actions-week {
+    opacity: 1 !important; /* Siempre visible en móvil */
+  }
+  
+  .calendario-futurista .calendar-controls {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  .calendario-futurista .nav-controls,
+  .calendario-futurista .view-controls,
+  .calendario-futurista .action-controls {
+    justify-content: center !important;
+  }
+}
