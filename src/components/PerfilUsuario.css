@@ -73,6 +73,38 @@
   text-shadow: var(--sw-glow) !important;
 }
 
+/* --- NAVEGACIÓN POR PESTAÑAS --- */
+.profile-tabs {
+  display: flex !important;
+  gap: 5px !important;
+  margin-bottom: 25px !important;
+  border-bottom: 1px solid rgba(45, 226, 255, 0.2) !important;
+}
+
+.tab-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #88c0d0 !important;
+  padding: 12px 20px !important;
+  cursor: pointer !important;
+  font-family: 'Exo 2', sans-serif !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 2px solid transparent !important;
+}
+
+.tab-btn:hover {
+  color: var(--sw-blue) !important;
+}
+
+.tab-btn.active {
+  color: var(--sw-blue) !important;
+  border-bottom-color: var(--sw-blue) !important;
+  text-shadow: var(--sw-glow) !important;
+}
+
 /* --- SECCIÓN DE ORGANIZACIÓN --- */
 .profile-card > label {
   font-size: 0.65rem !important;
@@ -207,6 +239,116 @@
   color: var(--sw-blue) !important;
 }
 
+/* --- SECCIONES DE FORMULARIO --- */
+.form-section {
+  background: rgba(45, 226, 255, 0.03) !important;
+  border: 1px solid rgba(45, 226, 255, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+.form-section h3 {
+  color: var(--sw-blue) !important;
+  font-size: 1rem !important;
+  margin: 0 0 15px 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.form-section textarea {
+  background: var(--input-bg) !important;
+  border: 1px solid rgba(45, 226, 255, 0.2) !important;
+  padding: 10px !important;
+  color: white !important;
+  font-family: 'Exo 2', sans-serif !important;
+  border-radius: 4px !important;
+  outline: none !important;
+  transition: 0.3s !important;
+  font-size: 0.9rem !important;
+  resize: vertical !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.form-section textarea:focus {
+  border-color: var(--sw-blue) !important;
+  box-shadow: var(--sw-glow) !important;
+  background: rgba(45, 226, 255, 0.05) !important;
+}
+
+.form-section select {
+  background: var(--input-bg) !important;
+  border: 1px solid rgba(45, 226, 255, 0.2) !important;
+  padding: 10px !important;
+  color: white !important;
+  font-family: 'Exo 2', sans-serif !important;
+  border-radius: 4px !important;
+  outline: none !important;
+  transition: 0.3s !important;
+  font-size: 0.9rem !important;
+}
+
+.form-section select:focus {
+  border-color: var(--sw-blue) !important;
+  box-shadow: var(--sw-glow) !important;
+}
+
+/* --- SECCIONES DE DIAGNÓSTICO --- */
+.diagnostic-section {
+  background: rgba(45, 226, 255, 0.03) !important;
+  border: 1px solid rgba(45, 226, 255, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+.diagnostic-section h3 {
+  color: var(--sw-blue) !important;
+  font-size: 1rem !important;
+  margin: 0 0 15px 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.diagnostic-info {
+  background: rgba(0, 0, 0, 0.2) !important;
+  padding: 15px !important;
+  border-radius: 6px !important;
+  border-left: 4px solid #88c0d0 !important;
+}
+
+.diagnostic-info.success {
+  border-left-color: var(--sw-blue) !important;
+  background: rgba(45, 226, 255, 0.05) !important;
+}
+
+.diagnostic-info.warning {
+  border-left-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.05) !important;
+}
+
+.diagnostic-info p {
+  margin: 8px 0 !important;
+  color: #e5e7eb !important;
+  font-size: 0.9rem !important;
+}
+
+.diagnostic-loading {
+  text-align: center !important;
+  padding: 30px !important;
+  color: var(--sw-blue) !important;
+  font-size: 1rem !important;
+}
+
+/* --- FORMULARIO DE MIGRACIÓN --- */
+.migration-form {
+  background: rgba(220, 38, 38, 0.05) !important;
+  border: 1px solid rgba(220, 38, 38, 0.2) !important;
+  border-radius: 6px !important;
+  padding: 20px !important;
+}
+
 /* --- BOTONES --- */
 .actions {
   margin-top: 30px !important;
@@ -258,6 +400,60 @@
   transform: none !important;
 }
 
+/* --- ACCIONES GLOBALES --- */
+.global-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 30px !important;
+}
+
+.btn-close {
+  width: 100% !important;
+  padding: 12px !important;
+  background: transparent !important;
+  border: 2px solid var(--sw-blue) !important;
+  color: var(--sw-blue) !important;
+  font-family: 'Exo 2', sans-serif !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  border-radius: 5px !important;
+  transition: all 0.3s ease !important;
+  letter-spacing: 1px !important;
+}
+
+.btn-close:hover {
+  background: var(--sw-blue) !important;
+  color: #000 !important;
+  box-shadow: 0 0 15px rgba(45, 226, 255, 0.5) !important;
+  letter-spacing: 2px !important;
+}
+
+.btn-logout {
+  width: 100% !important;
+  padding: 12px !important;
+  background: transparent !important;
+  border: 2px solid #ff003c !important;
+  color: #ff003c !important;
+  font-family: 'Exo 2', sans-serif !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  border-radius: 5px !important;
+  transition: all 0.3s ease !important;
+  letter-spacing: 1px !important;
+}
+
+.btn-logout:hover {
+  background: #ff003c !important;
+  color: #000 !important;
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.5) !important;
+  letter-spacing: 2px !important;
+}
+
 .icon-svg {
   width: 20px !important;
   height: 20px !important;
@@ -302,5 +498,13 @@
   
   .actions {
     flex-direction: column !important;
+  }
+  
+  .profile-tabs {
+    flex-direction: column !important;
+  }
+  
+  .tab-btn {
+    text-align: center !important;
   }
 }

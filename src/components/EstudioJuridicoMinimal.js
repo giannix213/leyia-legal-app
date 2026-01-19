@@ -1,121 +1,160 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { getColorPorTipo, getImagenPorTipo } from '../utils/casosUtils';
+import { useCasos } from '../hooks/useCasos';
 
 // Componente estilo Netflix con carrusel usando el diseño de CasoCard - Compatible con sidebar
 const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) => {
-  const expedientes = [
-    {
-      id: 'static-1',
-      numero: 'DEMO-001-2025',
-      cliente: 'Juan Pérez García',
-      demandante: 'Juan Pérez García',
-      demandado: 'Constructora ABC S.A.',
-      abogado: 'Dr. María López',
-      tipo: 'civil',
-      prioridad: 'alta',
-      estado: 'Activo',
-      progreso: 75,
-      descripcion: 'Demanda por incumplimiento de contrato de compraventa',
-      ultimaActualizacion: 'Revisar documentos de la compraventa',
-      organoJurisdiccional: 'Juzgado Civil de Lima',
-      fechaAudiencia: '2025-01-25',
-      horaAudiencia: '10:00'
-    },
-    {
-      id: 'static-2',
-      numero: 'DEMO-002-2025',
-      cliente: 'Ana Martínez Ruiz',
-      demandante: 'Ana Martínez Ruiz',
-      demandado: 'Carlos Rodríguez Silva',
-      abogado: 'Dr. Roberto Sánchez',
-      tipo: 'penal',
-      prioridad: 'media',
-      estado: 'probatoria',
-      progreso: 60,
-      descripcion: 'Proceso por lesiones culposas en accidente de tránsito',
-      ultimaActualizacion: 'Solicitar peritaje médico',
-      organoJurisdiccional: 'Juzgado Penal de San Isidro'
-    },
-    {
-      id: 'static-3',
-      numero: 'DEMO-003-2025',
-      cliente: 'Empresa XYZ Ltda.',
-      demandante: 'Empresa XYZ Ltda.',
-      demandado: 'Distribuidora DEF S.A.',
-      abogado: 'Dra. Carmen Vega',
-      tipo: 'comercial',
-      prioridad: 'baja',
-      estado: 'postulatoria',
-      progreso: 30,
-      descripcion: 'Cobro de facturas impagas por servicios prestados',
-      ultimaActualizacion: 'Revisar contratos de servicios',
-      organoJurisdiccional: 'Juzgado Comercial de Miraflores'
-    },
-    {
-      id: 'static-4',
-      numero: 'DEMO-004-2025',
-      cliente: 'María González López',
-      demandante: 'María González López',
-      demandado: 'Pedro Ramírez Castro',
-      abogado: 'Dra. Isabel Moreno',
-      tipo: 'familia',
-      prioridad: 'alta',
-      estado: 'Activo',
-      progreso: 85,
-      descripcion: 'Proceso de divorcio con custodia de menores',
-      ultimaActualizacion: 'Preparar documentación de bienes',
-      organoJurisdiccional: 'Juzgado de Familia de Lima Norte',
-      fechaAudiencia: '2025-01-28',
-      horaAudiencia: '14:30'
-    },
-    {
-      id: 'static-5',
-      numero: 'DEMO-005-2025',
-      cliente: 'Constructora DEF S.A.',
-      demandante: 'Luis Herrera Díaz',
-      demandado: 'Constructora DEF S.A.',
-      abogado: 'Dr. Fernando Castro',
-      tipo: 'laboral',
-      prioridad: 'media',
-      estado: 'contestacion',
-      progreso: 45,
-      descripcion: 'Demanda laboral por despido injustificado',
-      ultimaActualizacion: 'Revisar contratos laborales',
-      organoJurisdiccional: 'Juzgado Laboral de San Borja'
-    },
-    {
-      id: 'static-6',
-      numero: 'DEMO-006-2025',
-      cliente: 'Banco Nacional S.A.',
-      demandante: 'Banco Nacional S.A.',
-      demandado: 'Inversiones GHI Ltda.',
-      abogado: 'Dra. Patricia Mendoza',
-      tipo: 'comercial',
-      prioridad: 'alta',
-      estado: 'Activo',
-      progreso: 90,
-      descripcion: 'Ejecución de garantías hipotecarias',
-      ultimaActualizacion: 'Preparar documentos para remate',
-      organoJurisdiccional: 'Juzgado Comercial de San Isidro',
-      fechaAudiencia: '2025-01-30',
-      horaAudiencia: '09:00'
-    },
-    {
-      id: 'static-7',
-      numero: 'DEMO-007-2025',
-      cliente: 'Rosa Delgado Vásquez',
-      demandante: 'Rosa Delgado Vásquez',
-      demandado: 'Clínica Santa María S.A.',
-      abogado: 'Dr. Miguel Torres',
-      tipo: 'civil',
-      prioridad: 'media',
-      estado: 'probatoria',
-      progreso: 55,
-      descripcion: 'Responsabilidad civil médica por mala praxis',
-      ultimaActualizacion: 'Solicitar peritaje médico especializado',
-      organoJurisdiccional: 'Juzgado Civil de Surco'
+  // Hook para obtener casos reales
+  const { casos, cargando } = useCasos();
+
+  // Procesar casos reales para el carrusel - solo casos activos, limitados a 8
+  const expedientesParaCarrusel = useMemo(() => {
+    if (!casos || casos.length === 0) return [];
+    
+    return casos
+      .filter(caso => caso.archivado !== true && caso.estado?.toLowerCase() !== 'archivado')
+      .slice(0, 8) // Limitar a 8 casos para el carrusel
+      .map(caso => ({
+        id: caso.id,
+        numero: caso.numero || 'SIN-NUMERO',
+        cliente: caso.cliente || caso.demandante || 'Cliente no especificado',
+        demandante: caso.demandante || caso.cliente || 'Demandante no especificado',
+        demandado: caso.demandado || 'Demandado no especificado',
+        abogado: caso.abogado || 'Dr. Abogado Responsable',
+        tipo: caso.tipo || 'general',
+        prioridad: caso.prioridad || 'media',
+        estado: caso.estado || 'Activo',
+        progreso: Math.floor(Math.random() * 40) + 40, // Progreso simulado entre 40-80%
+        descripcion: caso.descripcion || 'Sin descripción disponible',
+        ultimaActualizacion: caso.ultimoActuado || caso.observaciones || 'Sin actualizaciones recientes',
+        organoJurisdiccional: caso.organoJurisdiccional || 'Órgano Jurisdiccional',
+        fechaAudiencia: caso.fechaAudiencia,
+        horaAudiencia: caso.horaAudiencia
+      }));
+  }, [casos]);
+
+  // Estadísticas reales basadas en los casos
+  const estadisticasCasos = useMemo(() => {
+    if (!casos || casos.length === 0) {
+      return {
+        prioridad: 0,
+        normales: 0,
+        proceso: 0
+      };
     }
-  ];
+
+    const casosActivos = casos.filter(caso => caso.archivado !== true && caso.estado?.toLowerCase() !== 'archivado');
+    
+    return {
+      prioridad: casosActivos.filter(caso => caso.prioridad === 'alta' || caso.urgente === true).length,
+      normales: casosActivos.filter(caso => caso.prioridad !== 'alta' && caso.urgente !== true).length,
+      proceso: casosActivos.filter(caso => caso.estado?.toLowerCase().includes('proceso') || caso.estado?.toLowerCase().includes('tramite')).length
+    };
+  }, [casos]);
+
+  // Calendario semanal dinámico con fechas reales
+  const diasSemanaReales = useMemo(() => {
+    const hoy = new Date();
+    const diasSemana = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
+    const dias = [];
+    
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      dias.push({
+        numero: fecha.getDate(),
+        esHoy: i === 0,
+        nombreDia: diasSemana[fecha.getDay()],
+        fecha: fecha
+      });
+    }
+    
+    return dias;
+  }, []);
+
+  // Tareas generadas basadas en casos reales
+  const tareasReales = useMemo(() => {
+    if (!casos || casos.length === 0) {
+      return [
+        { id: '1', titulo: 'Revisar casilla electrónica', tiempo: '15min', categoria: 'Comunicación', tipoCaso: 'general' },
+        { id: '2', titulo: 'Revisar notificaciones judiciales', tiempo: '30min', categoria: 'Comunicación', tipoCaso: 'general' }
+      ];
+    }
+
+    const casosActivos = casos.filter(caso => caso.archivado !== true && caso.estado?.toLowerCase() !== 'archivado');
+    const tareas = [];
+
+    // Tareas generales siempre presentes
+    tareas.push(
+      { id: 'gen-1', titulo: 'Revisar casilla electrónica', tiempo: '15min', categoria: 'Comunicación', tipoCaso: 'general' },
+      { id: 'gen-2', titulo: 'Revisar notificaciones judiciales', tiempo: '30min', categoria: 'Comunicación', tipoCaso: 'general' }
+    );
+
+    // Tareas basadas en casos con audiencias próximas
+    const casosConAudiencias = casosActivos.filter(caso => caso.fechaAudiencia);
+    if (casosConAudiencias.length > 0) {
+      tareas.push({
+        id: 'aud-1',
+        titulo: `Preparar audiencias (${casosConAudiencias.length} casos)`,
+        tiempo: `${casosConAudiencias.length * 30}min`,
+        categoria: 'Audiencias',
+        tipoCaso: casosConAudiencias[0]?.tipo || 'general'
+      });
+    }
+
+    // Tareas basadas en casos de alta prioridad
+    const casosUrgentes = casosActivos.filter(caso => caso.prioridad === 'alta' || caso.urgente === true);
+    if (casosUrgentes.length > 0) {
+      tareas.push({
+        id: 'urg-1',
+        titulo: `Revisar casos urgentes (${casosUrgentes.length})`,
+        tiempo: `${casosUrgentes.length * 20}min`,
+        categoria: 'Urgente',
+        tipoCaso: casosUrgentes[0]?.tipo || 'general'
+      });
+    }
+
+    // Tareas basadas en casos que necesitan actualización
+    const casosSinActualizar = casosActivos.filter(caso => 
+      !caso.ultimoActuado || !caso.observaciones || 
+      caso.ultimoActuado.trim() === '' || caso.observaciones.trim() === ''
+    );
+    if (casosSinActualizar.length > 0) {
+      tareas.push({
+        id: 'act-1',
+        titulo: `Actualizar estado de expedientes (${casosSinActualizar.length})`,
+        tiempo: `${Math.min(casosSinActualizar.length * 10, 60)}min`,
+        categoria: 'Actualización',
+        tipoCaso: casosSinActualizar[0]?.tipo || 'general'
+      });
+    }
+
+    // Tareas basadas en tipos de casos específicos
+    const casosPenales = casosActivos.filter(caso => caso.tipo?.toLowerCase() === 'penal');
+    if (casosPenales.length > 0) {
+      tareas.push({
+        id: 'pen-1',
+        titulo: `Revisar casos penales (${casosPenales.length})`,
+        tiempo: `${casosPenales.length * 25}min`,
+        categoria: 'Penal',
+        tipoCaso: 'penal'
+      });
+    }
+
+    const casosCiviles = casosActivos.filter(caso => caso.tipo?.toLowerCase() === 'civil');
+    if (casosCiviles.length > 0) {
+      tareas.push({
+        id: 'civ-1',
+        titulo: `Revisar casos civiles (${casosCiviles.length})`,
+        tiempo: `${casosCiviles.length * 20}min`,
+        categoria: 'Civil',
+        tipoCaso: 'civil'
+      });
+    }
+
+    // Limitar a máximo 6 tareas para que no se vea sobrecargado
+    return tareas.slice(0, 6);
+  }, [casos]);
 
   // Componente CasoCard adaptado para el carrusel
   const CasoCardCarrusel = ({ caso }) => {
@@ -517,30 +556,62 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
           overflow: 'hidden',
           marginBottom: '40px'
         }}>
-          <div style={{
-            display: 'flex',
-            gap: '16px',
-            width: '100%',
-            paddingBottom: '20px',
-            overflowX: 'auto',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#666 #333'
-          }}>
-            {expedientes.map(exp => (
-              <div key={exp.id} style={{
-                minWidth: 'calc(25% - 12px)',
-                maxWidth: 'calc(25% - 12px)',
-                cursor: 'pointer',
-                position: 'relative',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                flexShrink: 0
-              }}>
-                <CasoCardCarrusel caso={exp} />
+          {cargando ? (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              height: '320px',
+              color: 'white',
+              fontSize: '18px'
+            }}>
+              <div>
+                <div style={{ marginBottom: '10px' }}>🔄 Cargando casos...</div>
+                <div style={{ fontSize: '14px', opacity: 0.7 }}>Conectando con la base de datos</div>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : expedientesParaCarrusel.length === 0 ? (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              height: '320px',
+              color: 'white',
+              fontSize: '18px'
+            }}>
+              <div>
+                <div style={{ marginBottom: '10px' }}>📋 No hay casos activos</div>
+                <div style={{ fontSize: '14px', opacity: 0.7 }}>Crea tu primer expediente para comenzar</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              width: '100%',
+              paddingBottom: '20px',
+              overflowX: 'auto',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#666 #333'
+            }}>
+              {expedientesParaCarrusel.map(exp => (
+                <div key={exp.id} style={{
+                  minWidth: 'calc(25% - 12px)',
+                  maxWidth: 'calc(25% - 12px)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}
+                onClick={() => onAbrirExpediente && onAbrirExpediente(exp)}
+                >
+                  <CasoCardCarrusel caso={exp} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -575,15 +646,7 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
             position: 'relative',
             padding: '10px 0'
           }}>
-            {[
-              { numero: 20, esHoy: true, nombreDia: 'LUN' },
-              { numero: 21, esHoy: false, nombreDia: 'MAR' },
-              { numero: 22, esHoy: false, nombreDia: 'MIE' },
-              { numero: 23, esHoy: false, nombreDia: 'JUE' },
-              { numero: 24, esHoy: false, nombreDia: 'VIE' },
-              { numero: 25, esHoy: false, nombreDia: 'SAB' },
-              { numero: 26, esHoy: false, nombreDia: 'DOM' }
-            ].map(dia => (
+            {diasSemanaReales.map(dia => (
               <div key={dia.numero} style={{
                 background: dia.esHoy ? '#E50914' : '#333',
                 padding: '10px 6px',
@@ -658,7 +721,7 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
                   color: '#dc2626',
                   lineHeight: '1.3'
                 }}>
-                  3 expedientes de prioridad
+                  {estadisticasCasos.prioridad} expedientes de prioridad
                 </span>
               </div>
               
@@ -683,7 +746,7 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
                   color: '#d97706',
                   lineHeight: '1.3'
                 }}>
-                  3 expedientes que pueden esperar
+                  {estadisticasCasos.normales} expedientes que pueden esperar
                 </span>
               </div>
               
@@ -708,7 +771,7 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
                   color: '#2563eb',
                   lineHeight: '1.3'
                 }}>
-                  1 expediente en proceso
+                  {estadisticasCasos.proceso} expediente{estadisticasCasos.proceso !== 1 ? 's' : ''} en proceso
                 </span>
               </div>
             </div>
@@ -737,12 +800,7 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
             overflowY: 'auto',
             paddingRight: '8px'
           }}>
-            {[
-              { id: '1', titulo: 'Revisar casilla electrónica', tiempo: '15min', categoria: 'Comunicación', tipoCaso: 'general' },
-              { id: '2', titulo: 'Revisar notificaciones judiciales', tiempo: '30min', categoria: 'Comunicación', tipoCaso: 'general' },
-              { id: '3', titulo: 'Planificar agenda de la semana', tiempo: '20min', categoria: 'Actualización', tipoCaso: 'general' },
-              { id: '4', titulo: 'Actualizar estado de expedientes', tiempo: '45min', categoria: 'Actualización', tipoCaso: 'general' }
-            ].map(tarea => {
+            {tareasReales.map(tarea => {
               const colorTipoCaso = getColorPorTipo(tarea.tipoCaso);
 
               return (
@@ -787,7 +845,14 @@ const EstudioJuridicoMinimal = ({ onVolver, onAbrirExpediente, onIrATramites }) 
                       gap: '8px',
                       flex: 1
                     }}>
-                      <span style={{ fontSize: '16px' }}>📋</span>
+                      <span style={{ fontSize: '16px' }}>
+                        {tarea.categoria === 'Audiencias' ? '⚖️' :
+                         tarea.categoria === 'Urgente' ? '🔥' :
+                         tarea.categoria === 'Actualización' ? '📝' :
+                         tarea.categoria === 'Penal' ? '🏛️' :
+                         tarea.categoria === 'Civil' ? '📋' :
+                         '📋'}
+                      </span>
                       <div>
                         <div style={{
                           color: 'white',

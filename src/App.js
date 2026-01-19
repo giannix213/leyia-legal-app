@@ -6,7 +6,7 @@ import Casos from './components/Casos';
 import CajaChica from './components/CajaChica';
 import CalendarioContainer from './components/containers/CalendarioContainer';
 import Contactos from './components/Contactos';
-import ChatIA from './components/ChatIA';
+import ChatIAMinimal from './components/ChatIAMinimal';
 import Jurisprudencia from './components/Jurisprudencia';
 import TranscripcionDocumentos from './components/TranscripcionDocumentos';
 import PerfilUsuario from './components/PerfilUsuario';
@@ -507,7 +507,6 @@ function AppContent() {
           onVistaActivaChange={setVistaActivaCasos}
           showModal={mostrarModalNuevoCaso}
           onShowModalChange={setMostrarModalNuevoCaso}
-          onMostrarPerfil={() => setMostrarPerfil(true)}
         />;
       case 'contactos':
         return <Contactos />;
@@ -537,7 +536,6 @@ function AppContent() {
           onVistaActivaChange={setVistaActivaCasos}
           showModal={mostrarModalNuevoCaso}
           onShowModalChange={setMostrarModalNuevoCaso}
-          onMostrarPerfil={() => setMostrarPerfil(true)}
         />;
     }
   };
@@ -1114,11 +1112,85 @@ function AppContent() {
             </div>
           )}
 
+          {/* Botón de Perfil de Usuario */}
+          <div style={{ 
+            padding: sidebarCompressed ? '10px' : '20px 20px 10px 20px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            {sidebarCompressed ? (
+              <div
+                className="compressed-nav-icon"
+                onClick={() => setMostrarPerfil(true)}
+                title="Mi Perfil"
+                style={{
+                  cursor: 'pointer',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(0, 210, 255, 0.1)',
+                  border: '1px solid rgba(0, 210, 255, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 210, 255, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 210, 255, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 210, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 210, 255, 0.3)';
+                }}
+              >
+                <svg className="icon-svg" viewBox="0 0 24 24" style={{ fill: 'var(--neon-blue)' }}>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+              </div>
+            ) : (
+              <button
+                className="profile-btn"
+                onClick={() => setMostrarPerfil(true)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'rgba(0, 210, 255, 0.1)',
+                  border: '1px solid rgba(0, 210, 255, 0.3)',
+                  borderRadius: '8px',
+                  color: 'var(--neon-blue)',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 210, 255, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 210, 255, 0.5)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 210, 255, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 210, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 210, 255, 0.3)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+                Mi Perfil
+              </button>
+            )}
+          </div>
+
           {/* Botón de Logout al final del sidebar */}
           <div style={{ 
-            marginTop: 'auto', 
-            padding: sidebarCompressed ? '10px' : '20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+            marginTop: 'auto',
+            padding: sidebarCompressed ? '10px' : '20px 20px 20px 20px'
           }}>
             {sidebarCompressed ? (
               <div
@@ -1126,8 +1198,20 @@ function AppContent() {
                 onClick={async () => {
                   if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                     try {
+                      // Limpiar sesión de Firebase
                       await signOut(auth);
+                      
+                      // Limpiar contexto de organización
                       limpiarSesion();
+                      
+                      // Limpiar sesión persistente
+                      clearSession();
+                      
+                      // Limpiar localStorage adicional
+                      localStorage.removeItem('devMode');
+                      localStorage.removeItem('devUser');
+                      
+                      // Recargar para ir al login
                       window.location.reload();
                     } catch (error) {
                       console.error('Error al cerrar sesión:', error);
@@ -1156,8 +1240,20 @@ function AppContent() {
                 onClick={async () => {
                   if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                     try {
+                      // Limpiar sesión de Firebase
                       await signOut(auth);
+                      
+                      // Limpiar contexto de organización
                       limpiarSesion();
+                      
+                      // Limpiar sesión persistente
+                      clearSession();
+                      
+                      // Limpiar localStorage adicional
+                      localStorage.removeItem('devMode');
+                      localStorage.removeItem('devUser');
+                      
+                      // Recargar para ir al login
                       window.location.reload();
                     } catch (error) {
                       console.error('Error al cerrar sesión:', error);
@@ -1206,10 +1302,13 @@ function AppContent() {
         </div>
       </div>
       
-      <ChatIA 
-        notificacionesPendientes={notificacionesPendientes}
-        onNotificacionesVistas={() => setNotificacionesPendientes(0)}
-      />
+      {/* ChatIA Minimal con Gemini API */}
+      {true && (
+        <ChatIAMinimal 
+          notificacionesPendientes={notificacionesPendientes}
+          onNotificacionesVistas={() => setNotificacionesPendientes(0)}
+        />
+      )}
 
       {mostrarPerfil && (
         <PerfilUsuario 

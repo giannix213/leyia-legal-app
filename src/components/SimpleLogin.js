@@ -150,6 +150,12 @@ function SimpleLogin({ onLoginSuccess }) {
     setIsLoading(true);
 
     try {
+      // Verificar configuración de Firebase
+      if (!auth || !db) {
+        throw new Error('Firebase no está configurado correctamente');
+      }
+
+      // Limpiar sesión anterior si existe
       if (auth.currentUser) {
         await signOut(auth);
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -169,6 +175,8 @@ function SimpleLogin({ onLoginSuccess }) {
       provider.addScope('profile');
       provider.addScope('openid');
 
+      console.log('🔐 Iniciando autenticación con Google...');
+      
       const authPromise = signInWithPopup(auth, provider);
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('TIMEOUT')), 60000) // Aumentado a 60 segundos
@@ -176,13 +184,19 @@ function SimpleLogin({ onLoginSuccess }) {
 
       const result = await Promise.race([authPromise, timeoutPromise]);
       const user = result.user;
+      
+      console.log('✅ Usuario autenticado:', user.email);
       setUser(user);
 
+      // Verificar si el usuario ya tiene una organización
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        console.log('📋 Datos de usuario encontrados:', userData);
+        
         if (userData.organizationId && userData.organizationName) {
+          console.log('🏢 Usuario ya tiene organización, redirigiendo...');
           setTimeout(() => {
             onLoginSuccess({
               user: user,
@@ -193,20 +207,38 @@ function SimpleLogin({ onLoginSuccess }) {
         }
       }
 
+      console.log('🔍 Cargando organizaciones disponibles...');
       await loadOrganizations();
       setStep('organization');
     } catch (error) {
+      console.error('❌ Error en autenticación:', error);
+      
       let message = 'Error al iniciar sesión con Google';
+      let details = '';
       
       if (error.message === 'TIMEOUT') {
-        message = '⏰ Tiempo de espera agotado\n\nLa autenticación tardó demasiado. Intenta nuevamente.';
+        message = '⏰ Tiempo de espera agotado';
+        details = 'La autenticación tardó demasiado. Intenta nuevamente.';
       } else if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+        console.log('ℹ️ Usuario canceló la autenticación');
         return;
       } else if (error.code === 'auth/popup-blocked') {
-        message = '🚫 Popup bloqueado\n\nPor favor permite popups para este sitio y recarga la página.';
+        message = '🚫 Popup bloqueado';
+        details = 'Por favor permite popups para este sitio y recarga la página.';
+      } else if (error.code === 'auth/configuration-not-found') {
+        message = '⚙️ Error de configuración';
+        details = 'La configuración de Firebase no es válida. Contacta al administrador.';
+      } else if (error.code === 'auth/invalid-api-key') {
+        message = '🔑 API Key inválida';
+        details = 'La clave de API de Firebase no es válida. Verifica la configuración.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = '🌐 Error de conexión';
+        details = 'No se pudo conectar con los servidores. Verifica tu conexión a internet.';
+      } else {
+        details = `Código: ${error.code || 'desconocido'}\nMensaje: ${error.message}`;
       }
 
-      alert(message);
+      alert(`${message}\n\n${details}`);
     } finally {
       setIsLoading(false);
     }
@@ -421,6 +453,42 @@ function SimpleLogin({ onLoginSuccess }) {
                 </svg>
               </div>
               <span>{isLoading ? 'Iniciando sesión...' : 'Continuar con Google'}</span>
+            </button>
+
+            {/* Botón de diagnóstico */}
+            <button 
+              onClick={() => {
+                const config = window.firebaseDebug?.config || {};
+                const diagnostico = `
+🔧 DIAGNÓSTICO DE FIREBASE
+
+📋 Configuración:
+• API Key: ${config.apiKey ? (config.apiKey.startsWith('demo-') ? '❌ Demo (no válida)' : '✅ Configurada') : '❌ Faltante'}
+• Auth Domain: ${config.authDomain ? (config.authDomain.includes('demo-') ? '❌ Demo' : '✅ Configurada') : '❌ Faltante'}
+• Project ID: ${config.projectId ? (config.projectId === 'demo-project' ? '❌ Demo' : '✅ Configurada') : '❌ Faltante'}
+
+🌐 Estado de conexión:
+• Firebase Auth: ${window.firebaseDebug?.auth ? '✅ Disponible' : '❌ No disponible'}
+• Firestore: ${window.firebaseDebug?.db ? '✅ Disponible' : '❌ No disponible'}
+
+💡 Soluciones:
+${config.apiKey?.startsWith('demo-') ? '• Configura las variables de entorno en .env\n• Obtén las credenciales de Firebase Console' : '• Verifica tu conexión a internet\n• Revisa la consola del navegador para más detalles'}
+                `;
+                alert(diagnostico);
+              }}
+              style={{
+                marginTop: '10px',
+                padding: '8px 16px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '8px',
+                color: '#60a5fa',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🔧 Diagnóstico de Conexión
             </button>
 
             <div style={{

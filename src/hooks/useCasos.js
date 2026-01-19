@@ -41,8 +41,25 @@ export const useCasos = () => {
     console.log('  - organizacionActual?.id:', organizacionActual?.id);
     console.log('  - useRealtime:', useRealtime);
     
+    // Diagnóstico adicional del contexto
+    if (organizacionActual) {
+      console.log('🏢 Contexto de organización completo:', {
+        id: organizacionActual.id,
+        nombre: organizacionActual.nombre,
+        tipo: organizacionActual.tipo,
+        organizationId: organizacionActual.organizationId, // Por si acaso
+        keys: Object.keys(organizacionActual)
+      });
+    }
+    
     if (!organizacionActual?.id) {
       console.log('❌ No hay organización activa para listener');
+      console.log('❌ Estado del contexto:', {
+        organizacionActual,
+        esNull: organizacionActual === null,
+        esUndefined: organizacionActual === undefined,
+        tieneId: !!organizacionActual?.id
+      });
       setCasos([]);
       setCargando(false);
       return;
@@ -160,6 +177,11 @@ export const useCasos = () => {
     actualizarCaso,
     organizacionActual,
     useRealtime,
-    setUseRealtime
+    setUseRealtime,
+    // Funciones de diagnóstico
+    diagnosticarOrganizacion: () => casosService.diagnosticarOrganizacion(organizacionActual?.id),
+    migrarCasosOrfanos: () => casosService.migrarCasosOrfanos(organizacionActual?.id),
+    migrarCasosDeOtraOrganizacion: (organizacionOrigen) => 
+      casosService.migrarCasosDeOtraOrganizacion(organizacionOrigen, organizacionActual?.id)
   };
 };

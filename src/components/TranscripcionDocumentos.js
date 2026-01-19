@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './TranscripcionDocumentos.css';
 import { useOrganizacionContext } from '../contexts/OrganizacionContext';
 import { useTranscripcion } from '../hooks/useTranscripcion';
@@ -16,9 +16,19 @@ const TranscripcionDocumentos = () => {
   });
   const [documentoGenerado, setDocumentoGenerado] = useState(null);
 
+  // Estados para scroll personalizado
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState(0);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(true);
+
   // Referencias
   const videoInputRef = useRef(null);
   const modelInputRef = useRef(null);
+  const containerRef = useRef(null);
+  const section1Ref = useRef(null);
+  const section2Ref = useRef(null);
+  const section3Ref = useRef(null);
 
   // Contextos y hooks
   const { organizacionActual } = useOrganizacionContext();
@@ -48,6 +58,65 @@ const TranscripcionDocumentos = () => {
     tienePrompts,
     promptsPorTipo
   } = usePrompts(organizacionActual?.id);
+
+  // Efecto para manejar el scroll y actualizar indicadores
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight - container.clientHeight;
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      
+      setScrollProgress(progress);
+      setCanScrollUp(scrollTop > 0);
+      setCanScrollDown(scrollTop < scrollHeight - 10);
+
+      // Determinar sección activa
+      const section1Top = section1Ref.current?.offsetTop || 0;
+      const section2Top = section2Ref.current?.offsetTop || 0;
+      const section3Top = section3Ref.current?.offsetTop || 0;
+      
+      const currentScroll = scrollTop + container.clientHeight / 2;
+      
+      if (currentScroll >= section3Top) {
+        setActiveSection(2);
+      } else if (currentScroll >= section2Top) {
+        setActiveSection(1);
+      } else {
+        setActiveSection(0);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    handleScroll(); // Llamada inicial
+
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Funciones de scroll
+  const scrollToTop = () => {
+    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToBottom = () => {
+    const container = containerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToSection = (sectionIndex) => {
+    const refs = [section1Ref, section2Ref, section3Ref];
+    const targetRef = refs[sectionIndex];
+    
+    if (targetRef.current && containerRef.current) {
+      const container = containerRef.current;
+      const targetTop = targetRef.current.offsetTop - 100; // Offset para header
+      container.scrollTo({ top: targetTop, behavior: 'smooth' });
+    }
+  };
 
   /**
    * Maneja la subida de video - ARQUITECTURA LIMPIA
@@ -151,7 +220,55 @@ const TranscripcionDocumentos = () => {
   };
 
   return (
-    <div className="transcripcion-container">
+    <div 
+      className="transcripcion-container smooth-scroll" 
+      ref={containerRef}
+      style={{ '--scroll-progress': `${scrollProgress}%` }}
+    >
+      {/* Indicador de progreso de scroll */}
+      <div className="scroll-indicator"></div>
+
+      {/* Controles de scroll */}
+      <div className="scroll-controls">
+        <button 
+          className={`scroll-btn ${!canScrollUp ? 'disabled' : ''}`}
+          onClick={scrollToTop}
+          title="Ir al inicio"
+          disabled={!canScrollUp}
+        >
+          <i className="fas fa-chevron-up"></i>
+        </button>
+        <button 
+          className={`scroll-btn ${!canScrollDown ? 'disabled' : ''}`}
+          onClick={scrollToBottom}
+          title="Ir al final"
+          disabled={!canScrollDown}
+        >
+          <i className="fas fa-chevron-down"></i>
+        </button>
+      </div>
+
+      {/* Navegación por secciones */}
+      <div className="section-nav">
+        <div 
+          className={`section-nav-item ${activeSection === 0 ? 'active' : ''}`}
+          onClick={() => scrollToSection(0)}
+          data-section="Procesamiento"
+          title="Ir a Procesamiento de Video"
+        ></div>
+        <div 
+          className={`section-nav-item ${activeSection === 1 ? 'active' : ''}`}
+          onClick={() => scrollToSection(1)}
+          data-section="Prompts"
+          title="Ir a Gestión de Prompts"
+        ></div>
+        <div 
+          className={`section-nav-item ${activeSection === 2 ? 'active' : ''}`}
+          onClick={() => scrollToSection(2)}
+          data-section="Variables"
+          title="Ir a Variables y Vista Previa"
+        ></div>
+      </div>
       {/* Header */}
       <div className="transcripcion-header">
         <h1>Transcripción y Generación de Documentos</h1>
@@ -180,7 +297,7 @@ const TranscripcionDocumentos = () => {
 
       <div className="transcripcion-content">
         {/* Sección 1: Procesamiento de Video */}
-        <section className="section-card">
+        <section className="section-card" ref={section1Ref}>
           <h2 className="section-title">
             <span className="section-number">1</span>
             Procesamiento de Video
@@ -254,7 +371,7 @@ const TranscripcionDocumentos = () => {
         <hr className="divider" />
 
         {/* Sección 2: Gestión de Prompts */}
-        <section className="section-card">
+        <section className="section-card" ref={section2Ref}>
           <h2 className="section-title">
             <span className="section-number">2</span>
             Gestión de Prompts y Plantillas
@@ -335,7 +452,7 @@ const TranscripcionDocumentos = () => {
         <hr className="divider" />
 
         {/* Sección 3: Gestión de Variables y Vista Previa */}
-        <section className="section-card">
+        <section className="section-card" ref={section3Ref}>
           <h2 className="section-title">
             <span className="section-number">3</span>
             Variables y Vista Previa

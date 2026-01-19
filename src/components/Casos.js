@@ -17,8 +17,7 @@ function Casos({
   vistaActiva = 'activos', 
   onVistaActivaChange = () => {}, 
   showModal = false, 
-  onShowModalChange = () => {},
-  onMostrarPerfil = () => {}
+  onShowModalChange = () => {}
 }) {
   const { casos, cargando, eliminarCaso, agregarCaso, actualizarCaso, cargarCasos } = useCasos();
   const { organizacionActual } = useOrganizacionContext();
@@ -48,6 +47,11 @@ function Casos({
     console.log('🔍 [CASOS DEBUG] Iniciando filtrado de casos...');
     console.log('📊 [CASOS DEBUG] casos.length:', casos.length);
     console.log('📊 [CASOS DEBUG] casos:', casos);
+    console.log('📊 [CASOS DEBUG] vistaActiva:', vistaActiva);
+    console.log('📊 [CASOS DEBUG] busqueda:', busqueda);
+    
+    // Guardar casos en window para debugging
+    window.casosDebug = casos;
     
     let resultado = [...casos];
 
@@ -60,17 +64,24 @@ function Casos({
         caso.demandado?.toLowerCase().includes(termino) ||
         caso.descripcion?.toLowerCase().includes(termino)
       );
+      console.log('🔍 [CASOS DEBUG] Después de filtro de búsqueda:', resultado.length);
     }
 
     // Filtrar por vista (Activos vs Archivados)
     if (vistaActiva === 'archivados') {
       resultado = resultado.filter(caso => caso.archivado === true || caso.estado?.toLowerCase() === 'archivado');
+      console.log('📁 [CASOS DEBUG] Filtro archivados aplicado:', resultado.length);
     } else if (vistaActiva === 'activos') {
       resultado = resultado.filter(caso => caso.archivado !== true && caso.estado?.toLowerCase() !== 'archivado');
+      console.log('📋 [CASOS DEBUG] Filtro activos aplicado:', resultado.length);
     }
 
     console.log(`📊 [CASOS] Filtrado completado: ${resultado.length} de ${casos.length} casos.`);
     console.log('📋 [CASOS DEBUG] Casos filtrados:', resultado);
+    
+    // Guardar casos filtrados en window para debugging
+    window.casosOrdenadosDebug = resultado;
+    
     setCasosOrdenados(resultado);
   }, [casos, busqueda, vistaActiva]);
 
@@ -444,13 +455,6 @@ function Casos({
           >
             +
           </div>
-          <div 
-            className="user-profile"
-            onClick={() => onMostrarPerfil && onMostrarPerfil()}
-          >
-            <div className="status-light"></div>
-            <span>PERFIL</span>
-          </div>
         </div>
       </div>
       
@@ -760,20 +764,15 @@ function Casos({
         ) : (
           // Vista Normal - Grid directo de todas las tarjetas
           <div className="casos-grid-card">
-          {(() => {
-            console.log('🎨 [CASOS DEBUG] Renderizando tarjetas...');
-            console.log('📊 [CASOS DEBUG] casosOrdenados.length:', casosOrdenados.length);
-            console.log('📋 [CASOS DEBUG] casosOrdenados:', casosOrdenados);
-            
-            return casosOrdenados.map((caso, index) => {
-            const imagenFondo = getImagenPorTipo(caso.tipo);
-            const colorTipo = getColorPorTipo(caso.tipo);
-            const emojiTipo = getEmojiPorTipo(caso.tipo);
-            const colorEstado = getColorEstadoPorTipo(caso.tipo); // Nuevo: color para el estado
-            
-            console.log(`🎴 [CASOS DEBUG] Renderizando caso ${index}:`, caso.numero);
-            
-            return (
+            {casosOrdenados.map((caso, index) => {
+              console.log(`🎴 [CASOS DEBUG] Renderizando caso ${index}:`, caso.numero);
+              
+              const imagenFondo = getImagenPorTipo(caso.tipo);
+              const colorTipo = getColorPorTipo(caso.tipo);
+              const emojiTipo = getEmojiPorTipo(caso.tipo);
+              const colorEstado = getColorEstadoPorTipo(caso.tipo); // Nuevo: color para el estado
+              
+              return (
               <div 
                 key={caso.id} 
                 className={`caso-card-game ${draggedItem === index ? 'dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
@@ -1009,8 +1008,7 @@ function Casos({
                 </div>
               </div>
             );
-          })();
-          })}
+            })}
           </div>
         )}
 
