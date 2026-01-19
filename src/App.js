@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import './components/Sidebar.css';
 import './components/CasosGalactico.css';
@@ -10,7 +10,7 @@ import ChatIA from './components/ChatIA';
 import Jurisprudencia from './components/Jurisprudencia';
 import TranscripcionDocumentos from './components/TranscripcionDocumentos';
 import PerfilUsuario from './components/PerfilUsuario';
-import EstudioJuridico from './components/EstudioJuridico';
+import EstudioJuridicoMinimal from './components/EstudioJuridicoMinimal';
 import SimpleLogin from './components/SimpleLogin';
 import EstadisticasSimple from './components/EstadisticasSimple';
 import Equipo from './components/Equipo';
@@ -18,6 +18,7 @@ import WindowDiagnostic from './components/WindowDiagnostic';
 import QuickNavigator from './components/QuickNavigator';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
 import { OrganizacionProvider, useOrganizacionContext } from './contexts/OrganizacionContext';
+import { useAuthPersistence } from './hooks/useAuthPersistence';
 
 import { db, auth } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -51,11 +52,19 @@ function AppContent() {
   const [mostrarPerfil, setMostrarPerfil] = useState(false);
   const [perfilUsuario, setPerfilUsuario] = useState(null);
   
-  // Estados de autenticación
+  // Hook de persistencia de autenticación mejorado
+  const { 
+    user, 
+    organization, 
+    isLoading, 
+    saveSession, 
+    clearSession, 
+    hasValidSession,
+    setOrganization: setOrganizationPersistent
+  } = useAuthPersistence();
+  
+  // Estados derivados de la autenticación
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [organization, setOrganization] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   
   // Estado para la búsqueda de casos
   const [busquedaCasos, setBusquedaCasos] = useState('');
@@ -105,21 +114,40 @@ function AppContent() {
     }
   }, []);
 
+  // Sincronizar estado de autenticación con el hook de persistencia
+  useEffect(() => {
+    if (user && organization) {
+      setIsAuthenticated(true);
+      if (!currentView) {
+        setCurrentView('casos');
+      }
+      
+      // Establecer en el contexto de organización
+      establecerUsuario(user);
+      establecerOrganizacion(organization);
+      
+      console.log('✅ Usuario autenticado con sesión persistente:', user.email);
+    } else if (!isLoading) {
+      setIsAuthenticated(false);
+      if (currentView !== 'login') {
+        setCurrentView('login');
+      }
+    }
+  }, [user, organization, isLoading, currentView, establecerUsuario, establecerOrganizacion]);
+
   // Sincronizar organización del contexto con estado local
   useEffect(() => {
-    if (organizacionActual && !organization) {
-      console.log('🔄 Sincronizando organización desde contexto:', organizacionActual);
-      
-      // Convertir formato del contexto al formato esperado por App.js
-      const organizationForApp = {
+  if (organizacionActual) {
+    // Solo actualizar si realmente son diferentes para evitar bucles
+    if (!organization || organization.organizationId !== organizacionActual.id) {
+      setOrganizationPersistent({
         organizationId: organizacionActual.id,
         organizationName: organizacionActual.nombre,
         organizationType: organizacionActual.tipo
-      };
-      
-      setOrganization(organizationForApp);
+      });
     }
-  }, [organizacionActual, organization]);
+  }
+}, [organizacionActual, organization, setOrganizationPersistent]);
 
   // Autenticación simplificada para desarrollo
   useEffect(() => {
@@ -142,11 +170,10 @@ function AppContent() {
         
         console.log('✅ Configurando usuario de desarrollo:', fakeUser.email);
         
-        setUser(fakeUser);
-        setOrganization(fakeOrganization);
-        setIsAuthenticated(true);
+        // Usar el sistema de persistencia para modo dev
+        saveSession(fakeUser, fakeOrganization);
+        setOrganizationPersistent(fakeOrganization);
         setCurrentView('casos');
-        setIsLoading(false);
         
         // Sincronizar con el contexto
         establecerOrganizacion(fakeOrganization);
@@ -183,11 +210,10 @@ function AppContent() {
         organizationType: 'law-firm'
       };
       
-      setUser(fakeUser);
-      setOrganization(fakeOrganization);
-      setIsAuthenticated(true);
+      // Usar el sistema de persistencia para Electron
+      saveSession(fakeUser, fakeOrganization);
+      setOrganizationPersistent(fakeOrganization);
       setCurrentView('casos');
-      setIsLoading(false);
       
       setPerfilUsuario({
         nombre: fakeUser.displayName,
@@ -201,72 +227,9 @@ function AppContent() {
       return;
     }
     
-    console.log('🌐 Modo web - Configurando Firebase Auth');
-    if (!auth) {
-      console.log('❌ Firebase Auth no disponible');
-      setIsLoading(false);
-      return;
-    }
-    
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log('🔥 Firebase Auth cambió:', firebaseUser ? firebaseUser.email : 'null');
-      
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        setIsAuthenticated(true);
-        
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            if (userData.organizationId && userData.organizationName) {
-              const organizationData = {
-                id: userData.organizationId,
-                name: userData.organizationName,
-                type: userData.organizationType
-              };
-              setOrganization(organizationData);
-              
-              // Sincronizar con el contexto
-              establecerOrganizacion(organizationData);
-              establecerUsuario(firebaseUser);
-              
-              setPerfilUsuario({
-                nombre: firebaseUser.displayName,
-                email: firebaseUser.email,
-                fotoPerfil: firebaseUser.photoURL,
-                organizacion: userData.organizationName,
-                tipo: userData.organizationType
-              });
-              
-              setCurrentView('casos');
-              console.log('✅ Usuario Firebase con organización configurado');
-            } else {
-              console.log('⚠️ Usuario sin organización - mostrando login');
-              setCurrentView('login');
-            }
-          } else {
-            console.log('⚠️ Usuario sin documento - mostrando login');
-            setCurrentView('login');
-          }
-        } catch (error) {
-          console.error('❌ Error cargando datos de usuario:', error);
-          setCurrentView('login');
-        }
-      } else {
-        console.log('👤 No hay usuario autenticado');
-        setUser(null);
-        setOrganization(null);
-        setPerfilUsuario(null);
-        setIsAuthenticated(false);
-        setCurrentView('login');
-      }
-      
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    console.log('🌐 Modo web - Firebase Auth manejado por useAuthPersistence');
+    // El hook useAuthPersistence ya maneja Firebase Auth, no necesitamos duplicar la lógica
+  }, [saveSession, setOrganizationPersistent]);
 
   // Listener para navegación desde el calendario
   useEffect(() => {
@@ -328,7 +291,34 @@ function AppContent() {
     };
   }, []);
 
+  // Handlers memoizados para EstudioJuridico para evitar re-renders
+  const handleEstudioVolver = useCallback(() => {
+    setCurrentView('casos');
+    setSidebarVisible(true);
+  }, []);
+
+  const handleEstudioAbrirExpediente = useCallback((expediente) => {
+    setExpedienteSeleccionado(expediente);
+    setCurrentView('casos');
+    setSidebarVisible(true);
+  }, []);
+
+  const handleEstudioIrATramites = useCallback(() => {
+    // Navegar a la vista de trámites/tareas
+    setCurrentView('casos'); // Por ahora redirigir a casos
+    setSidebarVisible(true);
+  }, []);
+
   const handleLoginSuccess = (loginData) => {
+    console.log('🔐 handleLoginSuccess llamado con:', loginData);
+    console.log('🔍 Analizando datos de login:', {
+      hasUser: !!loginData.user,
+      hasOrganization: !!loginData.organization,
+      hasOrganizacion: !!loginData.organizacion,
+      organizationKeys: loginData.organization ? Object.keys(loginData.organization) : [],
+      organizacionKeys: loginData.organizacion ? Object.keys(loginData.organizacion) : []
+    });
+    
     if (loginData.user && (loginData.user.uid === 'dev-user-123' || loginData.user.uid === 'temp-user-123')) {
       const fakeUser = loginData.user;
       const fakeOrganization = {
@@ -337,11 +327,10 @@ function AppContent() {
         organizationType: 'estudio'
       };
       
-      setUser(fakeUser);
-      setOrganization(fakeOrganization);
-      setIsAuthenticated(true);
+      // Usar el sistema de persistencia para modo dev
+      saveSession(fakeUser, fakeOrganization);
+      setOrganizationPersistent(fakeOrganization);
       setCurrentView('casos');
-      setIsLoading(false);
       
       // Sincronizar con el contexto
       establecerOrganizacion(fakeOrganization);
@@ -361,18 +350,29 @@ function AppContent() {
       return;
     }
     
-    if (loginData.user && loginData.organizacion) {
+    // Aceptar tanto 'organization' (inglés) como 'organizacion' (español)
+    const orgData = loginData.organization || loginData.organizacion;
+    
+    console.log('🏢 Datos de organización extraídos:', {
+      orgData,
+      fromOrganization: !!loginData.organization,
+      fromOrganizacion: !!loginData.organizacion,
+      hasOrgData: !!orgData
+    });
+    
+    if (loginData.user && orgData) {
       const organizationData = {
-        id: loginData.organizacion.id,
-        name: loginData.organizacion.nombre || loginData.organizacion.name,
-        type: loginData.organizacion.tipo || loginData.organizacion.type || 'estudio'
+        id: orgData.organizationId || orgData.id,
+        name: orgData.organizationName || orgData.nombre || orgData.name,
+        type: orgData.organizationType || orgData.tipo || orgData.type || 'estudio'
       };
       
-      setUser(loginData.user);
-      setOrganization(organizationData);
-      setIsAuthenticated(true);
+      console.log('✅ Organización configurada:', organizationData);
+      
+      // Usar el sistema de persistencia mejorado
+      saveSession(loginData.user, organizationData);
+      setOrganizationPersistent(organizationData);
       setCurrentView('casos');
-      setIsLoading(false);
       
       // Sincronizar con el contexto
       establecerOrganizacion(organizationData);
@@ -382,16 +382,28 @@ function AppContent() {
         nombre: loginData.user.displayName || loginData.user.email,
         email: loginData.user.email,
         fotoPerfil: loginData.user.photoURL,
-        organizacion: loginData.organizacion.nombre || loginData.organizacion.name,
-        tipo: loginData.organizacion.tipo || loginData.organizacion.type || 'estudio'
+        organizacion: organizationData.name,
+        tipo: organizationData.type
       });
       
+      console.log('🎉 Sesión guardada con persistencia extendida (30 días)');
       return;
     }
     
-    localStorage.removeItem('session');
+    console.error('❌ Login sin organización válida:', loginData);
+    
+    // Limpiar cualquier modo de desarrollo que pueda estar interfiriendo
+    clearSession();
     localStorage.removeItem('devMode');
     localStorage.removeItem('devUser');
+    localStorage.removeItem('organizacionActual');
+    localStorage.removeItem('usuarioActual');
+    
+    // Forzar recarga para limpiar estado
+    console.log('🔄 Forzando recarga para limpiar estado...');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const handleLogout = async () => {
@@ -400,43 +412,67 @@ function AppContent() {
         await signOut(auth);
       }
       
-      setUser(null);
-      setOrganization(null);
+      // Usar el sistema de persistencia para limpiar la sesión
+      clearSession();
       setPerfilUsuario(null);
-      setIsAuthenticated(false);
       setCurrentView('login');
-      setIsLoading(false);
       
       // Limpiar contexto
       limpiarSesion();
       
       // Limpieza selectiva de localStorage (NO usar localStorage.clear())
       const keysToRemove = [
-        'session',
         'devMode', 
         'devUser',
         'organizacionActual',
         'usuarioActual',
-        'textosExpedientes',
-        'sidebarCompressed',
-        'sidebarCollapsedSections'
+        'textosExpedientes'
+        // Mantener configuraciones de UI como sidebarCompressed y sidebarCollapsedSections
       ];
       
       keysToRemove.forEach(key => {
         localStorage.removeItem(key);
       });
       
+      console.log('👋 Sesión cerrada y limpiada correctamente');
+      
     } catch (error) {
-      setUser(null);
-      setOrganization(null);
+      // En caso de error, forzar limpieza
+      clearSession();
       setPerfilUsuario(null);
-      setIsAuthenticated(false);
       setCurrentView('login');
-      setIsLoading(false);
       
       // Limpiar contexto
       limpiarSesion();
     }
+  };
+
+  // Función para forzar limpieza completa (útil para debugging)
+  const forzarLimpiezaCompleta = () => {
+    console.log('🧹 FORZANDO LIMPIEZA COMPLETA...');
+    
+    // Cerrar sesión de Firebase si existe
+    if (auth.currentUser) {
+      signOut(auth).catch(console.error);
+    }
+    
+    // Limpiar TODO el localStorage
+    localStorage.clear();
+    
+    // Limpiar estado de la aplicación usando el sistema de persistencia
+    clearSession();
+    setPerfilUsuario(null);
+    setCurrentView(null);
+    
+    // Limpiar contexto
+    limpiarSesion();
+    
+    console.log('✅ Limpieza completa realizada - Recargando...');
+    
+    // Recargar página
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const renderContent = () => {
@@ -450,16 +486,10 @@ function AppContent() {
       case 'parallax-demo':
         return <div>Funcionalidad en desarrollo...</div>;
       case 'estudio':
-        return <EstudioJuridico 
-          onVolver={() => {
-            setCurrentView('casos');
-            setSidebarVisible(true);
-          }}
-          onAbrirExpediente={(expediente) => {
-            setExpedienteSeleccionado(expediente);
-            setCurrentView('casos');
-            setSidebarVisible(true);
-          }}
+        return <EstudioJuridicoMinimal 
+          onVolver={handleEstudioVolver}
+          onAbrirExpediente={handleEstudioAbrirExpediente}
+          onIrATramites={handleEstudioIrATramites}
         />;
       case 'calendario':
         return <CalendarioContainer />;
@@ -555,7 +585,7 @@ function AppContent() {
         organizationType: 'law-firm'
       };
       
-      setOrganization(defaultOrganization);
+      setOrganizationPersistent(defaultOrganization);
       establecerOrganizacion(defaultOrganization);
       
       console.log('⚠️ Creando organización por defecto para usuario:', user.email);
@@ -636,7 +666,6 @@ function AppContent() {
                     className={`compressed-nav-icon ${currentView === 'estudio' ? 'active' : ''}`}
                     onClick={() => {
                       setCurrentView('estudio');
-                      setSidebarVisible(false);
                       setTempExpandedSection(null);
                     }}
                     title="Estudio Jurídico"
@@ -687,10 +716,7 @@ function AppContent() {
                 <>
                   <div
                     className={`nav-item ${currentView === 'estudio' ? 'active' : ''}`}
-                    onClick={() => {
-                      setCurrentView('estudio');
-                      setSidebarVisible(false);
-                    }}
+                    onClick={() => setCurrentView('estudio')}
                   >
                     <svg className="icon-svg" viewBox="0 0 24 24">
                       <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
@@ -1087,11 +1113,95 @@ function AppContent() {
               )}
             </div>
           )}
+
+          {/* Botón de Logout al final del sidebar */}
+          <div style={{ 
+            marginTop: 'auto', 
+            padding: sidebarCompressed ? '10px' : '20px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            {sidebarCompressed ? (
+              <div
+                className="compressed-nav-icon"
+                onClick={async () => {
+                  if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    try {
+                      await signOut(auth);
+                      limpiarSesion();
+                      window.location.reload();
+                    } catch (error) {
+                      console.error('Error al cerrar sesión:', error);
+                      alert('Error al cerrar sesión');
+                    }
+                  }
+                }}
+                title="Cerrar Sesión"
+                style={{
+                  cursor: 'pointer',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg className="icon-svg" viewBox="0 0 24 24" style={{ fill: '#ef4444' }}>
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+              </div>
+            ) : (
+              <button
+                className="logout-btn"
+                onClick={async () => {
+                  if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    try {
+                      await signOut(auth);
+                      limpiarSesion();
+                      window.location.reload();
+                    } catch (error) {
+                      console.error('Error al cerrar sesión:', error);
+                      alert('Error al cerrar sesión');
+                    }
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '8px',
+                  color: '#ef4444',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                Cerrar Sesión
+              </button>
+            )}
+          </div>
         </nav>
       )}
 
-      <div className={`main-content ${currentView === 'estudio' ? 'fullscreen-estudio' : sidebarVisible ? (sidebarCompressed ? 'sidebar-compressed' : 'sidebar-visible') : 'sidebar-hidden'}`}>
-        <div className={`content-area ${currentView === 'estudio' ? 'estudio-content-area' : (currentView === 'equipo' || currentView === 'caja' || currentView === 'calendario') ? 'star-wars-view' : currentView === 'casos' ? 'galactic-casos' : ''}`}>
+      <div className={`main-content ${sidebarVisible ? (sidebarCompressed ? 'sidebar-compressed' : 'sidebar-visible') : 'sidebar-hidden'}`}>
+        <div className={`content-area ${(currentView === 'equipo' || currentView === 'caja' || currentView === 'calendario') ? 'star-wars-view' : currentView === 'casos' ? 'galactic-casos' : ''}`}>
           {renderContent()}
         </div>
       </div>

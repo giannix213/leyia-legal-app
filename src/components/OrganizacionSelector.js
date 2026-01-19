@@ -25,31 +25,59 @@ const OrganizacionSelector = ({ onOrganizacionSeleccionada, onVolver, mostrarMod
     codigoAcceso: ''
   });
 
+  import React, { useState, useEffect, useCallback } from 'react';
+import { useOrganizaciones } from '../hooks/useOrganizaciones';
+import FirestoreExportPanel from './FirestoreExportPanel';
+
+const OrganizacionSelector = ({ onOrganizacionSeleccionada, onVolver, mostrarModal = true }) => {
+  const {
+    organizaciones,
+    organizacionActual,
+    cargando,
+    error,
+    cargarOrganizaciones,
+    crearOrganizacion,
+    unirseAOrganizacion
+  } = useOrganizaciones();
+
+  const [modo, setModo] = useState('seleccionar'); 
+  const [orgIdInput, setOrgIdInput] = useState('');
+  const [codigoAcceso, setCodigoAcceso] = useState('');
+  const [mostrarExportacion, setMostrarExportacion] = useState(false);
+
+  // ✅ 1. CARGA INICIAL ÚNICA
   useEffect(() => {
     cargarOrganizaciones();
   }, []);
 
-  // Si ya hay una organización seleccionada, no mostrar el modal
+  // ✅ 2. SINCRONIZACIÓN FORZADA
+  // Si detectamos una organización actual, notificamos al padre de inmediato
+  // para que se dispare la carga de expedientes.
   useEffect(() => {
-    if (organizacionActual && onOrganizacionSeleccionada) {
+    if (organizacionActual?.id && onOrganizacionSeleccionada) {
+      console.log("📡 Org Detectada, sincronizando expedientes:", organizacionActual.id);
       onOrganizacionSeleccionada(organizacionActual);
     }
-  }, [organizacionActual, onOrganizacionSeleccionada]);
+  }, [organizacionActual?.id]); // Solo reacciona si el ID cambia
 
-  const handleCrearOrganizacion = async (e) => {
-    e.preventDefault();
-    
-    if (!nuevaOrg.nombre.trim()) {
-      alert('El nombre de la organización es requerido');
+  // ✅ 3. MANEJADORES OPTIMIZADOS (Evitan re-renders innecesarios)
+  const handleSeleccionarOrganizacion = useCallback(async (org) => {
+    if (org.requiereCodigoAcceso) {
+      setOrgIdInput(org.id);
+      setModo('unirse');
       return;
     }
-
-    const orgCreada = await crearOrganizacion(nuevaOrg);
     
-    if (orgCreada && onOrganizacionSeleccionada) {
-      onOrganizacionSeleccionada(orgCreada);
-    }
-  };
+    const orgData = await unirseAOrganizacion(org.id);
+    if (orgData) onOrganizacionSeleccionada?.(orgData);
+  }, [unirseAOrganizacion, onOrganizacionSeleccionada]);
+
+  // Si ya estamos dentro de una organización válida, no estorbamos en la UI
+  if (!mostrarModal || (organizacionActual && organizacionActual.id !== 'default')) {
+    return null;
+  }
+
+  // ... (Aquí sigue tu JSX de la terminal galáctica igual que antes)
 
   const handleUnirseOrganizacion = async (e) => {
     e.preventDefault();
@@ -81,9 +109,11 @@ const OrganizacionSelector = ({ onOrganizacionSeleccionada, onVolver, mostrarMod
     }
   };
 
-  if (!mostrarModal || organizacionActual) {
-    return null;
+useEffect(() => {
+  if (organizacionActual && onOrganizacionSeleccionada) {
+    onOrganizacionSeleccionada(organizacionActual);
   }
+}, [organizacionActual, onOrganizacionSeleccionada]);
 
   // Mostrar panel de exportación
   if (mostrarExportacion) {

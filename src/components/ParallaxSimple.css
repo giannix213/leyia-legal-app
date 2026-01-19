@@ -1,0 +1,80 @@
+.parallax-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000000;
+  z-index: 0; /* Asegura que el loading esté por encima de todo */
+}
+
+/* Capa 1: Imagen de fondo */
+.parallax-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(1) contrast(1.1); /* Oscurece la imagen para que brillen las estrellas */
+  transform: scale(1.05); /* Evita bordes blancos en el resize */
+}
+
+/* Capa 2: Estrellas (Canvas) */
+.starfield-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none; /* Permite clics a través del canvas */
+}
+
+/* Capa 3: Overlay sutil para profundidad */
+.parallax-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    rgba(188, 19, 254, 0.05) 0%, /* Tinte púrpura muy suave al centro */
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Capa 4: Contenido (Logo/Texto) */
+.parallax-content {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+}
+
+/* Animación de entrada para el logo o hijos */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.parallax-content > * {
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}

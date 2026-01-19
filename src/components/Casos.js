@@ -1,5 +1,5 @@
 // src/components/Casos.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react'; // Añadido useMemo para eficiencia
 import { useCasos } from '../hooks/useCasos';
 import { useOrganizacionContext } from '../contexts/OrganizacionContext';
 import { getColorPorTipo, getImagenPorTipo, getEmojiPorTipo, getColorEstadoPorTipo } from '../utils/casosUtils';
@@ -20,103 +20,129 @@ function Casos({
   onShowModalChange = () => {},
   onMostrarPerfil = () => {}
 }) {
-  console.log('🎬 [CASOS COMPONENT] Renderizando componente Casos');
-  console.log('📥 [CASOS COMPONENT] Props recibidas:', { busqueda, vistaActiva, showModal });
-  
   const { casos, cargando, eliminarCaso, agregarCaso, actualizarCaso, cargarCasos } = useCasos();
   const { organizacionActual } = useOrganizacionContext();
-  
-  console.log('🔗 [CASOS COMPONENT] Hook useCasos:', { 
-    casosLength: casos.length, 
-    cargando,
-    organizacionId: organizacionActual?.id 
-  });
-  
-  // Debug temporal - mostrar información de la organización
-  console.log('🏢 [CASOS COMPONENT] Organización actual:', organizacionActual);
   
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [casosOrdenados, setCasosOrdenados] = useState([]);
   const [selectedExpediente, setSelectedExpediente] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Estados para agrupación y observaciones
   const [vistaAgrupada, setVistaAgrupada] = useState(false);
   const [observacionesEditando, setObservacionesEditando] = useState({});
   const [observacionesTemp, setObservacionesTemp] = useState({});
-  
-  // Estados para el menú contextual
-  const [contextMenu, setContextMenu] = useState({
-    visible: false,
-    x: 0,
-    y: 0,
-    expediente: null
-  });
-  
-  // Esta función es la que conectará los botones con Firebase
-const handleMarcarTipo = async (id, tipo) => {
-  try {
-    // 'tipo' será 'tarea', 'coordinacion' o 'diligencia'
-    await actualizarCaso(id, { tipoTarea: tipo });
-    
-    // Actualizamos el estado local para que la Vista General se entere al instante
-    setCasosOrdenados(prev => 
-      prev.map(c => c.id === id ? { ...c, tipoTarea: tipo } : c)
-    );
-  } catch (error) {
-    console.error("Error al marcar el tipo:", error);
-  }
-};
-  // Estados para el modal de confirmación
-  const [confirmDelete, setConfirmDelete] = useState({
-    isOpen: false,
-    expediente: null,
-    isDeleting: false
-  });
-
-  // Agrega esto debajo de tus otros estados
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, expediente: null });
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, expediente: null, isDeleting: false });
   const [mostrarVistaGeneral, setMostrarVistaGeneral] = useState(false);
 
-  // Actualizar casos ordenados cuando cambien los casos originales
+  // 1. CARGA DE DATOS: Efecto para disparar la carga inicial y por cambios
   useEffect(() => {
-    console.log('🔄 [CASOS COMPONENT] Casos recibidos:', casos.length);
-    console.log('🔍 [CASOS COMPONENT] Organización:', organizacionActual?.id);
-    console.log('🔍 [CASOS COMPONENT] Vista activa:', vistaActiva);
-    console.log('🔍 [CASOS COMPONENT] Búsqueda:', busqueda);
-    console.log('📋 [CASOS COMPONENT] Casos completos:', casos);
+    if (organizacionActual) {
+      console.log('📡 [CASOS] Solicitando carga de casos para:', organizacionActual.id || organizacionActual.organizacionId);
+      cargarCasos();
+    }
+  }, [organizacionActual, cargarCasos]);
+
+  // 2. LÓGICA DE FILTRADO: Definimos casosFiltrados aquí para evitar errores de "not defined"
+  useEffect(() => {
+    console.log('🔍 [CASOS DEBUG] Iniciando filtrado de casos...');
+    console.log('📊 [CASOS DEBUG] casos.length:', casos.length);
+    console.log('📊 [CASOS DEBUG] casos:', casos);
     
-    let casosFiltrados = [...casos]; // Crear copia para evitar mutaciones
-    console.log('📦 [CASOS COMPONENT] Casos antes de filtros:', casosFiltrados.length);
-    
-    // Filtrar por búsqueda si existe
+    let resultado = [...casos];
+
+    // Filtrar por búsqueda
     if (busqueda && busqueda.trim() !== '') {
-      const terminoBusqueda = busqueda.toLowerCase();
-      casosFiltrados = casosFiltrados.filter(caso => 
-        caso.numero?.toLowerCase().includes(terminoBusqueda) ||
-        caso.cliente?.toLowerCase().includes(terminoBusqueda) ||
-        caso.demandado?.toLowerCase().includes(terminoBusqueda) ||
-        caso.descripcion?.toLowerCase().includes(terminoBusqueda) ||
-        caso.tipo?.toLowerCase().includes(terminoBusqueda)
+      const termino = busqueda.toLowerCase();
+      resultado = resultado.filter(caso => 
+        caso.numero?.toLowerCase().includes(termino) ||
+        caso.cliente?.toLowerCase().includes(termino) ||
+        caso.demandado?.toLowerCase().includes(termino) ||
+        caso.descripcion?.toLowerCase().includes(termino)
       );
-      console.log('🔍 [CASOS COMPONENT] Después de filtro de búsqueda:', casosFiltrados.length);
     }
-    
-    // Filtrar por vista activa (activos/archivados)
+
+    // Filtrar por vista (Activos vs Archivados)
     if (vistaActiva === 'archivados') {
-      casosFiltrados = casosFiltrados.filter(caso => caso.archivado === true);
-      console.log('📁 [CASOS COMPONENT] Mostrando archivados:', casosFiltrados.length);
-    } else {
-      casosFiltrados = casosFiltrados.filter(caso => caso.archivado !== true);
-      console.log('✅ [CASOS COMPONENT] Mostrando activos:', casosFiltrados.length);
+      resultado = resultado.filter(caso => caso.archivado === true || caso.estado?.toLowerCase() === 'archivado');
+    } else if (vistaActiva === 'activos') {
+      resultado = resultado.filter(caso => caso.archivado !== true && caso.estado?.toLowerCase() !== 'archivado');
     }
-    
-    console.log('📊 [CASOS COMPONENT] Casos FINALES después de filtros:', casosFiltrados.length);
-    console.log('📋 [CASOS COMPONENT] Casos filtrados detalle:', casosFiltrados);
-    console.log('🎯 [CASOS COMPONENT] Actualizando casosOrdenados con', casosFiltrados.length, 'casos');
-    
-    setCasosOrdenados(casosFiltrados);
-  }, [casos, busqueda, vistaActiva, organizacionActual?.id]);
+
+    console.log(`📊 [CASOS] Filtrado completado: ${resultado.length} de ${casos.length} casos.`);
+    console.log('📋 [CASOS DEBUG] Casos filtrados:', resultado);
+    setCasosOrdenados(resultado);
+  }, [casos, busqueda, vistaActiva]);
+
+  // 3. CERRAR MENÚ CONTEXTUAL: Efecto para manejar clics fuera y scroll
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (contextMenu.visible) {
+        setContextMenu({
+          visible: false,
+          x: 0,
+          y: 0,
+          expediente: null
+        });
+      }
+    };
+
+    const handleScroll = () => {
+      if (contextMenu.visible) {
+        setContextMenu({
+          visible: false,
+          x: 0,
+          y: 0,
+          expediente: null
+        });
+      }
+    };
+
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('scroll', handleScroll, true);
+    }
+      
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [contextMenu.visible]);
+
+  // Handler para marcar tipo (Tarea, Coordinación, etc.)
+  const handleMarcarTipo = async (id, tipo) => {
+    try {
+      await actualizarCaso(id, { tipoTarea: tipo });
+      // La actualización de casosOrdenados ocurrirá automáticamente por el useEffect superior
+    } catch (error) {
+      console.error("❌ Error al marcar el tipo:", error);
+    }
+  };
+
+  // --- Handlers de Modales y UI ---
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedExpediente(null);
+  };
+
+  const handleNewExpedienteSuccess = () => {
+    onShowModalChange(false);
+    cargarCasos(); // Recargar tras crear uno nuevo
+  };
+
+  // 3. RENDERIZADO: Aquí evitamos el error de "return outside of function"
+  if (cargando && casos.length === 0) {
+    return (
+      <div className="galactic-mainframe">
+        <div className="loading-container">
+          <div className="loader"></div>
+          <p>Sincronizando expedientes con la nube...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // This early return was causing the simplified card display - removing it
 
   // Funciones para edición de observaciones
   const iniciarEdicionObservaciones = (casoId, observacionesActuales) => {
@@ -215,24 +241,11 @@ const handleMarcarTipo = async (id, tipo) => {
     setIsModalOpen(true);
   };
 
-  // Función para cerrar el modal
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedExpediente(null);
-    // Ya no necesitamos recargar manualmente, el listener en tiempo real lo hace automáticamente
-  };
-
   // Función para cerrar el modal de nuevo expediente
   const handleCloseNewExpedienteModal = () => {
     if (onShowModalChange) {
       onShowModalChange(false);
     }
-  };
-
-  // Función para manejar el éxito al crear un nuevo expediente
-  const handleNewExpedienteSuccess = () => {
-    handleCloseNewExpedienteModal();
-    // Los casos se recargarán automáticamente por el hook useCasos
   };
 
   // Función para manejar clic derecho
@@ -295,31 +308,7 @@ const handleMarcarTipo = async (id, tipo) => {
     }
   };
 
-  // Cerrar menú contextual al hacer clic fuera o scroll
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (contextMenu.visible) {
-        handleCloseContextMenu();
-      }
-    };
-
-    const handleScroll = () => {
-      if (contextMenu.visible) {
-        handleCloseContextMenu();
-      }
-    };
-
-    if (contextMenu.visible) {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('scroll', handleScroll, true);
-      
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('scroll', handleScroll, true);
-      };
-    }
-  }, [contextMenu.visible]);
-
+  // Renderizado condicional - debe ir después de todos los hooks
   if (cargando) {
     return (
       <div className="galactic-mainframe">
@@ -470,7 +459,7 @@ const handleMarcarTipo = async (id, tipo) => {
       {/* Contenido directo sin contenedores limitantes */}
       {/* Contenido según la vista seleccionada */}
       {vistaAgrupada ? (
-          /* Vista Agrupada por Tipo */
+          // Vista Agrupada por Tipo
           <div className="casos-vista-agrupada">
             {(() => {
               const grupos = agruparCasosPorTipo(casosOrdenados);
@@ -769,13 +758,20 @@ const handleMarcarTipo = async (id, tipo) => {
             })()}
           </div>
         ) : (
-          /* Vista Normal - Grid directo de todas las tarjetas */
+          // Vista Normal - Grid directo de todas las tarjetas
           <div className="casos-grid-card">
-          {casosOrdenados.map((caso, index) => {
+          {(() => {
+            console.log('🎨 [CASOS DEBUG] Renderizando tarjetas...');
+            console.log('📊 [CASOS DEBUG] casosOrdenados.length:', casosOrdenados.length);
+            console.log('📋 [CASOS DEBUG] casosOrdenados:', casosOrdenados);
+            
+            return casosOrdenados.map((caso, index) => {
             const imagenFondo = getImagenPorTipo(caso.tipo);
             const colorTipo = getColorPorTipo(caso.tipo);
             const emojiTipo = getEmojiPorTipo(caso.tipo);
             const colorEstado = getColorEstadoPorTipo(caso.tipo); // Nuevo: color para el estado
+            
+            console.log(`🎴 [CASOS DEBUG] Renderizando caso ${index}:`, caso.numero);
             
             return (
               <div 
@@ -1013,6 +1009,7 @@ const handleMarcarTipo = async (id, tipo) => {
                 </div>
               </div>
             );
+          })();
           })}
           </div>
         )}

@@ -38,7 +38,10 @@ export const OrganizacionProvider = ({ children }) => {
       
       console.log('🔄 Organización normalizada:', {
         original: orgData,
-        normalizada: normalizada
+        normalizada: normalizada,
+        organizationId: orgData.organizationId,
+        id: orgData.id,
+        fallbackUsed: !orgData.organizationId && !orgData.id
       });
       
       return normalizada;

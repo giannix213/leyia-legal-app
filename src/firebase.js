@@ -1,6 +1,6 @@
 // src/firebase.js - Configuración principal de Firebase
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
@@ -31,6 +31,17 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
+
+// Configurar persistencia de autenticación para que dure más tiempo
+try {
+  setPersistence(auth, browserLocalPersistence).then(() => {
+    console.log('✅ Persistencia de autenticación configurada (Local Storage)');
+  }).catch((error) => {
+    console.warn('⚠️ No se pudo configurar persistencia:', error);
+  });
+} catch (error) {
+  console.warn('⚠️ Error configurando persistencia:', error);
+}
 
 // Debug en desarrollo
 if (process.env.NODE_ENV === 'development') {

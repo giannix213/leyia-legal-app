@@ -1,0 +1,160 @@
+/* SimpleLogin Styles */
+
+/* Contenedor con fondo */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.login-card-simple {
+  position: relative;
+  z-index: 10;
+}
+
+.login-brand-simple {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand-logo-simple {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo-simple img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-title-simple {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0.5rem 0;
+  letter-spacing: 2px;
+}
+
+.brand-subtitle-simple {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.login-features-simple {
+  margin: 2rem 0;
+}
+
+.feature-grid-simple {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.feature-card-simple {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-card-simple:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.feature-icon-simple {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+}
+
+.feature-card-simple span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+}
+
+.login-actions-simple {
+  margin-top: 2rem;
+}
+
+.google-btn-simple {
+  width: 100%;
+  padding: 14px 20px;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.google-btn-simple:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.google-btn-simple:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-icon-simple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email-btn-simple:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.login-footer-simple {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.security-badges-simple {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.badge-simple {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.shortcut-hint {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+}

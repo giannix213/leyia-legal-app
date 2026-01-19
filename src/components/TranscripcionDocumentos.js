@@ -1,24 +1,153 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './TranscripcionDocumentos.css';
+import { useOrganizacionContext } from '../contexts/OrganizacionContext';
+import { useTranscripcion } from '../hooks/useTranscripcion';
+import { usePrompts } from '../hooks/usePrompts';
 
 const TranscripcionDocumentos = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState('acta');
+  // Estados locales para UI
+  const [selectedTemplate, setSelectedTemplate] = useState('resolucion');
+  const [uploadedVideo, setUploadedVideo] = useState(null);
   const [variables, setVariables] = useState({
     numeroResolucion: '001-2024',
     tipoTramite: 'TIPO DE TRÁMITE',
     nombreSolicitante: 'NOMBRE DEL SOLICITANTE',
     fechaActual: new Date().toLocaleDateString('es-ES')
   });
+  const [documentoGenerado, setDocumentoGenerado] = useState(null);
 
-  const handleVariableClick = (varName) => {
-    const newValue = prompt(`Ingrese el nuevo valor para ${varName}:`, variables[varName]);
-    if (newValue !== null) {
-      setVariables({ ...variables, [varName]: newValue });
+  // Referencias
+  const videoInputRef = useRef(null);
+  const modelInputRef = useRef(null);
+
+  // Contextos y hooks
+  const { organizacionActual } = useOrganizacionContext();
+  
+  // Hook de transcripción
+  const {
+    transcripcion,
+    isProcessing: isTranscribing,
+    error: transcripcionError,
+    progress,
+    procesarArchivo,
+    descargarTranscripcion,
+    tieneTranscripcion
+  } = useTranscripcion();
+
+  // Hook de prompts
+  const {
+    prompts,
+    promptSeleccionado,
+    isLoading: isLoadingPrompts,
+    error: promptsError,
+    isGenerating,
+    seleccionarPrompt,
+    generarDocumento,
+    descargarDocumento,
+    instalarPromptsDefault,
+    tienePrompts,
+    promptsPorTipo
+  } = usePrompts(organizacionActual?.id);
+
+  /**
+   * Maneja la subida de video - ARQUITECTURA LIMPIA
+   */
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadedVideo(file);
+    
+    try {
+      const exito = await procesarArchivo(file, {
+        language: 'es',
+        model: 'whisper-1'
+      });
+
+      if (exito) {
+        console.log('✅ Transcripción completada exitosamente');
+      }
+    } catch (error) {
+      console.error('❌ Error en transcripción:', error);
+      alert(`Error al procesar el video: ${error.message}`);
     }
   };
 
-  const handleDownload = () => {
-    alert('Descargando documento...');
+  /**
+   * Maneja la subida de modelos/prompts
+   */
+  const handleModelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      alert(`Modelo "${file.name}" cargado. Esta funcionalidad se completará con el backend.`);
+    } catch (error) {
+      console.error('Error subiendo modelo:', error);
+      alert('Error al subir el modelo');
+    }
+  };
+
+  /**
+   * Genera documento usando IA - ARQUITECTURA LIMPIA
+   */
+  const handleGenerarDocumento = async () => {
+    if (!tieneTranscripcion) {
+      alert('Primero debe procesar un video para obtener la transcripción');
+      return;
+    }
+
+    if (!promptSeleccionado) {
+      alert('Debe seleccionar un prompt para generar el documento');
+      return;
+    }
+
+    try {
+      const resultado = await generarDocumento(transcripcion, variables, selectedTemplate);
+      
+      if (resultado.success) {
+        setDocumentoGenerado(resultado);
+        console.log('✅ Documento generado exitosamente');
+      }
+    } catch (error) {
+      console.error('❌ Error generando documento:', error);
+      alert(`Error al generar documento: ${error.message}`);
+    }
+  };
+
+  /**
+   * Descarga el documento generado
+   */
+  const handleDownloadDocument = () => {
+    if (!documentoGenerado) {
+      alert('Primero debe generar un documento');
+      return;
+    }
+
+    try {
+      const nombreArchivo = `${selectedTemplate}_${variables.numeroResolucion || 'documento'}.txt`;
+      descargarDocumento(documentoGenerado.content, nombreArchivo, variables);
+    } catch (error) {
+      alert(`Error al descargar: ${error.message}`);
+    }
+  };
+
+  /**
+   * Instala prompts predeterminados si no existen
+   */
+  const handleInstalarPrompts = async () => {
+    if (!organizacionActual?.id) {
+      alert('Error: No se pudo identificar la organización');
+      return;
+    }
+
+    try {
+      await instalarPromptsDefault();
+      alert('✅ Prompts predeterminados instalados correctamente');
+    } catch (error) {
+      console.error('Error instalando prompts:', error);
+      alert(`❌ Error instalando prompts: ${error.message}`);
+    }
   };
 
   return (
@@ -26,6 +155,27 @@ const TranscripcionDocumentos = () => {
       {/* Header */}
       <div className="transcripcion-header">
         <h1>Transcripción y Generación de Documentos</h1>
+        <div className="header-status">
+          {/* Indicador de estado de Gemini */}
+          <div className={`api-status ${process.env.REACT_APP_GEMINI_API_KEY ? 'configured' : 'not-configured'}`}>
+            {process.env.REACT_APP_GEMINI_API_KEY ? (
+              <span>🤖 Gemini API: Configurada</span>
+            ) : (
+              <span>⚠️ Gemini API: No configurada (modo simulación)</span>
+            )}
+          </div>
+          
+          {isTranscribing && (
+            <div className="status-indicator processing">
+              <span>Procesando... {progress}%</span>
+            </div>
+          )}
+          {isGenerating && (
+            <div className="status-indicator generating">
+              <span>Generando documento...</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="transcripcion-content">
@@ -35,60 +185,215 @@ const TranscripcionDocumentos = () => {
             <span className="section-number">1</span>
             Procesamiento de Video
           </h2>
-          <div className="grid-4">
-            <div className="action-card upload-card">
-              <i className="fas fa-cloud-upload-alt"></i>
-              <span>Subir Video</span>
+          
+          {/* Mostrar errores */}
+          {transcripcionError && (
+            <div className="error-message">
+              ❌ {transcripcionError}
             </div>
-            <div className="action-card disabled">
+          )}
+
+          <div className="grid-4">
+            <div 
+              className={`action-card upload-card ${isTranscribing ? 'processing' : ''}`}
+              onClick={() => !isTranscribing && videoInputRef.current?.click()}
+            >
+              <i className={isTranscribing ? "fas fa-spinner fa-spin" : "fas fa-cloud-upload-alt"}></i>
+              <span>{isTranscribing ? `Procesando ${progress}%` : 'Subir Video'}</span>
+              <input 
+                ref={videoInputRef}
+                type="file" 
+                accept="video/*,audio/*"
+                style={{ display: 'none' }}
+                onChange={handleVideoUpload}
+                disabled={isTranscribing}
+              />
+            </div>
+            
+            <div 
+              className={`action-card ${!tieneTranscripcion ? 'disabled' : ''}`}
+              onClick={tieneTranscripcion ? () => descargarTranscripcion() : null}
+            >
               <i className="fas fa-file-alt"></i>
               <span>Descargar Transcripción</span>
             </div>
-            <div className="action-card">
+            
+            <div className="action-card" onClick={() => modelInputRef.current?.click()}>
               <i className="fas fa-magic"></i>
               <span>Agregar Prompt / Modelo</span>
+              <input 
+                ref={modelInputRef}
+                type="file" 
+                accept=".txt,.docx,.pdf"
+                style={{ display: 'none' }}
+                onChange={handleModelUpload}
+              />
             </div>
-            <div className="action-card disabled">
+            
+            <div 
+              className={`action-card ${!documentoGenerado ? 'disabled' : ''}`}
+              onClick={documentoGenerado ? handleDownloadDocument : null}
+            >
               <i className="fas fa-file-word"></i>
               <span>Descargar Documento</span>
+            </div>
+          </div>
+
+          {/* Mostrar transcripción si existe */}
+          {tieneTranscripcion && (
+            <div className="transcripcion-preview">
+              <h3>Transcripción Obtenida:</h3>
+              <div className="transcripcion-text">
+                {transcripcion.substring(0, 300)}
+                {transcripcion.length > 300 && '...'}
+              </div>
+            </div>
+          )}
+        </section>
+
+        <hr className="divider" />
+
+        {/* Sección 2: Gestión de Prompts */}
+        <section className="section-card">
+          <h2 className="section-title">
+            <span className="section-number">2</span>
+            Gestión de Prompts y Plantillas
+          </h2>
+
+          {/* Mostrar errores de prompts */}
+          {promptsError && (
+            <div className="error-message">
+              ❌ {promptsError}
+            </div>
+          )}
+
+          <div className="prompts-section">
+            <div className="prompts-header">
+              <div className="prompts-info">
+                <span>Prompts disponibles: {prompts.length}</span>
+                {organizacionActual?.id && (
+                  <span style={{fontSize: '11px', color: '#64748b'}}>
+                    Org: {organizacionActual.id.substring(0, 8)}...
+                  </span>
+                )}
+                {!tienePrompts && (
+                  <button className="btn-install-prompts" onClick={handleInstalarPrompts}>
+                    Instalar Prompts Predeterminados
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {tienePrompts && (
+              <div className="prompts-grid">
+                <div className="prompts-selector">
+                  <label>Seleccionar Prompt:</label>
+                  <select 
+                    value={promptSeleccionado?.id || ''}
+                    onChange={(e) => {
+                      const prompt = prompts.find(p => p.id === e.target.value);
+                      seleccionarPrompt(prompt);
+                    }}
+                  >
+                    <option value="">Seleccione un prompt...</option>
+                    {Object.entries(promptsPorTipo).map(([tipo, promptsTipo]) => (
+                      <optgroup key={tipo} label={tipo.toUpperCase()}>
+                        {promptsTipo.map(prompt => (
+                          <option key={prompt.id} value={prompt.id}>
+                            {prompt.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                {promptSeleccionado && (
+                  <div className="prompt-preview">
+                    <h4>{promptSeleccionado.nombre}</h4>
+                    <p className="prompt-description">{promptSeleccionado.descripcion}</p>
+                    <div className="prompt-content">
+                      {promptSeleccionado.contenido.substring(0, 200)}...
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="generation-controls">
+              <button 
+                className={`btn-generate ${(!tieneTranscripcion || !promptSeleccionado || isGenerating) ? 'disabled' : ''}`}
+                onClick={handleGenerarDocumento}
+                disabled={!tieneTranscripcion || !promptSeleccionado || isGenerating}
+              >
+                {isGenerating ? 'Generando...' : 'Generar Documento con IA'}
+              </button>
             </div>
           </div>
         </section>
 
         <hr className="divider" />
 
-        {/* Sección 2: Generación por Dictado */}
+        {/* Sección 3: Gestión de Variables y Vista Previa */}
         <section className="section-card">
           <h2 className="section-title">
-            <span className="section-number">2</span>
-            Generación por Dictado y Plantillas
+            <span className="section-number">3</span>
+            Variables y Vista Previa
           </h2>
-          <div className="grid-2">
-            <div className="left-panel">
-              <label className="input-label">Agregar Modelos (Plantillas)</label>
-              <select 
-                className="select-input"
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value)}
-              >
-                <option value="acta">Acta de Reunión</option>
-                <option value="resumen">Resumen de Archivo</option>
-                <option value="informe">Informe Técnico</option>
-              </select>
-              <button className="btn-secondary">Cargar Datos Adicionales</button>
-            </div>
-            <div className="right-panel">
-              <div className="mic-container">
-                <button className="mic-button">
-                  <i className="fas fa-microphone"></i>
-                </button>
-                <p className="mic-label">Dictado por Voz</p>
+          
+          <div className="variables-grid">
+            <div className="variables-left">
+              <label className="upload-label">Configurar Variables del Documento</label>
+              <div className="variables-form">
+                {Object.entries(variables).map(([key, value]) => (
+                  <div key={key} className="variable-item">
+                    <label>{key.replace(/([A-Z])/g, ' $1').toLowerCase()}:</label>
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => setVariables({...variables, [key]: e.target.value})}
+                      className="variable-input"
+                    />
+                  </div>
+                ))}
               </div>
-              <div className="download-link">
-                <button className="btn-link">
-                  <i className="fas fa-download"></i>
-                  <span>Descargar Doc Final</span>
-                </button>
+            </div>
+
+            <div className="variables-right">
+              <div className="preview-header">
+                <span className="preview-title">Vista Previa del Documento</span>
+                <div className="template-selector">
+                  <select 
+                    value={selectedTemplate}
+                    onChange={(e) => setSelectedTemplate(e.target.value)}
+                  >
+                    <option value="resolucion">Resolución</option>
+                    <option value="acta">Acta</option>
+                    <option value="informe">Informe</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="preview-document">
+                {documentoGenerado ? (
+                  <div className="generated-content">
+                    <h4>Documento Generado:</h4>
+                    <pre className="document-content">
+                      {documentoGenerado.content.substring(0, 500)}
+                      {documentoGenerado.content.length > 500 && '...'}
+                    </pre>
+                  </div>
+                ) : (
+                  <div className="preview-placeholder">
+                    <p>El documento generado aparecerá aquí...</p>
+                    <p className="preview-hint">
+                      1. Suba un video para obtener transcripción<br/>
+                      2. Seleccione un prompt<br/>
+                      3. Configure las variables<br/>
+                      4. Genere el documento
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -97,97 +402,15 @@ const TranscripcionDocumentos = () => {
 
       {/* Footer */}
       <div className="transcripcion-footer">
-        Sistema de Inteligencia Artificial para procesamiento de documentos v1.0
-      </div>
-
-      {/* Sección 3: Gestión de Modelos */}
-      <section className="models-section">
-        <h2 className="models-title">
-          <span className="models-badge">3</span>
-          Gestión de Modelos y Resoluciones
-        </h2>
-        <div className="models-grid">
-          {/* Panel Izquierdo */}
-          <div className="models-left">
-            <div className="upload-section">
-              <label className="upload-label">1. Subir Modelo (Resolución, Admisorio, etc.)</label>
-              <div className="upload-zone">
-                <div className="upload-content">
-                  <i className="fas fa-file-upload"></i>
-                  <p>Subir archivo .docx o .pdf</p>
-                </div>
-                <input type="file" className="file-input" />
-              </div>
-            </div>
-            <div className="data-section">
-              <label className="upload-label">2. Completar Información</label>
-              <button className="btn-add-data">
-                <i className="fas fa-plus-circle"></i>
-                Agregar Datos del Caso
-              </button>
-              <p className="help-text">* Aquí ingresas los nombres, fechas o datos que cambian.</p>
-            </div>
-          </div>
-
-          {/* Panel Derecho - Vista Previa */}
-          <div className="models-right">
-            <div className="preview-header">
-              <span className="preview-title">Vista Previa del Modelo</span>
-              <div className="legend">
-                <span className="legend-item variable">SUBRAYAR VARIABLE</span>
-                <span className="legend-item fixed">TEXTO FIJO</span>
-              </div>
-            </div>
-            <div className="preview-document">
-              <p className="doc-title">
-                RESOLUCIÓN NÚMERO{' '}
-                <span 
-                  className="variable-field"
-                  onClick={() => handleVariableClick('numeroResolucion')}
-                  title="Haga clic para cambiar"
-                >
-                  [{variables.numeroResolucion}]
-                </span>
-              </p>
-              <p className="doc-paragraph">
-                Visto el proceso de{' '}
-                <span 
-                  className="variable-field"
-                  onClick={() => handleVariableClick('tipoTramite')}
-                >
-                  [{variables.tipoTramite}]
-                </span>
-                {' '}presentado por el ciudadano{' '}
-                <span 
-                  className="variable-field"
-                  onClick={() => handleVariableClick('nombreSolicitante')}
-                >
-                  [{variables.nombreSolicitante}]
-                </span>
-                ...
-              </p>
-              <p className="doc-paragraph">
-                Se resuelve: <strong>ADMITIR</strong> a trámite la solicitud de referencia bajo los términos legales vigentes en la fecha{' '}
-                <span 
-                  className="variable-field"
-                  onClick={() => handleVariableClick('fechaActual')}
-                >
-                  [{variables.fechaActual}]
-                </span>.
-              </p>
-              <div className="doc-signature">
-                [Firma de la Autoridad]
-              </div>
-            </div>
-            <div className="preview-actions">
-              <button className="btn-download" onClick={handleDownload}>
-                <i className="fas fa-file-download"></i>
-                Descargar Documento Final
-              </button>
-            </div>
-          </div>
+        <div className="footer-info">
+          Sistema de IA para procesamiento de documentos v2.0 - Arquitectura Limpia
         </div>
-      </section>
+        <div className="footer-status">
+          {uploadedVideo && <span>📹 Video: {uploadedVideo.name}</span>}
+          {tieneTranscripcion && <span>📝 Transcripción lista</span>}
+          {promptSeleccionado && <span>🤖 Prompt: {promptSeleccionado.nombre}</span>}
+        </div>
+      </div>
     </div>
   );
 };
