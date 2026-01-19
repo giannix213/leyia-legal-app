@@ -6,7 +6,7 @@
 ## 🎉 Configuración Exitosa
 
 ### ✅ **API Key Verificada**
-- **API Key**: `AIzaSyDVdVANXO5cbLUj9ROnya9VatmZtnQM-iM`
+- **API Key**: `[YOUR_GEMINI_API_KEY]`
 - **Estado**: ✅ Funcionando correctamente
 - **Modelo**: `gemini-2.5-flash` (el más reciente disponible)
 
@@ -73,7 +73,7 @@ npm start
 
 ### Si ves "⚠️ Gemini API: No configurada"
 1. Verificar que existe `.env` en la raíz
-2. Verificar que contiene: `REACT_APP_GEMINI_API_KEY=AIzaSyDVdVANXO5cbLUj9ROnya9VatmZtnQM-iM`
+2. Verificar que contiene: `REACT_APP_GEMINI_API_KEY=[YOUR_GEMINI_API_KEY]`
 3. Reiniciar la aplicación: `npm start`
 
 ### Si falla la transcripción
