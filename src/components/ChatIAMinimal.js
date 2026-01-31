@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAIService from '../services/OpenAIService';
+import { useOrganizacionContext } from '../contexts/OrganizacionContext';
+import { useCasos } from '../hooks/useCasos';
 import './ChatIA.css';
 
 function ChatIAMinimal({ notificacionesPendientes = 0, onNotificacionesVistas }) {
+  const { organizacionActual } = useOrganizacionContext();
+  const { agregarCaso } = useCasos();
+  
   const [mensajes, setMensajes] = useState([]);
   const [inputMensaje, setInputMensaje] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -13,27 +18,27 @@ function ChatIAMinimal({ notificacionesPendientes = 0, onNotificacionesVistas })
   });
   const [arrastrando, setArrastrando] = useState(false);
   const [offsetArrastre, setOffsetArrastre] = useState({ x: 0, y: 0 });
-  const [geminiAPI, setGeminiAPI] = useState(null);
+  const [openAIService, setOpenAIService] = useState(null);
   const mensajesEndRef = useRef(null);
   const inicializado = useRef(false);
 
-  // Inicializar Gemini API
+  // Inicializar OpenAI Service
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-    console.log('🔑 API Key disponible:', !!apiKey);
-    
-    if (apiKey) {
-      try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        // Usar modelo disponible en v1beta
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        setGeminiAPI(model);
-        console.log('🤖 Gemini API inicializada correctamente con modelo gemini-pro');
-      } catch (error) {
-        console.error('❌ Error inicializando Gemini API:', error);
-      }
-    } else {
-      console.error('❌ No se encontró la API key de Gemini');
+    try {
+      const openAI = new OpenAIService();
+      setOpenAIService(openAI);
+      console.log('🤖 OpenAI Service inicializado correctamente');
+    } catch (error) {
+      console.error('❌ Error inicializando OpenAI Service:', error);
+      
+      // Mostrar mensaje de error en el chat
+      const mensajeError = {
+        tipo: 'ia',
+        texto: '❌ **Error de configuración de OpenAI**\n\nNo se pudo inicializar el servicio de OpenAI. Verifica que la API key esté configurada correctamente en el archivo .env\n\n🔧 **Solución:**\n• Verifica que REACT_APP_OPENAI_API_KEY esté configurada\n• Recarga la página después de configurar la API key',
+        timestamp: new Date()
+      };
+      
+      setMensajes(prev => [...prev, mensajeError]);
     }
   }, []);
 
@@ -42,7 +47,7 @@ function ChatIAMinimal({ notificacionesPendientes = 0, onNotificacionesVistas })
     if (!inicializado.current) {
       const mensajeBienvenida = {
         tipo: 'ia',
-        texto: '👋 **¡Hola! Soy LEYIA, tu asistente jurídico con IA**\n\n🤖 **Powered by Google Gemini**\n\n💬 Puedes preguntarme sobre:\n• Consultas legales generales\n• Análisis de documentos\n• Redacción de escritos\n• Investigación jurídica\n\n✨ **¡Estoy aquí para ayudarte!**',
+        texto: '👋 **¡Hola! Soy LEYIA, tu asistente jurídico con IA**\n\n🤖 **Powered by OpenAI GPT-4**\n\n💬 **Puedes preguntarme sobre:**\n• Consultas legales generales\n• Análisis de documentos\n• Redacción de escritos\n• Investigación jurídica\n\n🏗️ **CREACIÓN INTELIGENTE DE EXPEDIENTES:**\n• "Crear expediente para [Cliente], caso de [tipo]"\n• "Nuevo caso laboral para María García, despido injustificado"\n• "Crear caso penal, robo agravado, imputado Juan López"\n• "Registrar expediente de divorcio para Ana Martínez"\n\n✨ **¡Estoy aquí para ayudarte con IA avanzada de OpenAI!**',
         timestamp: new Date()
       };
       setMensajes([mensajeBienvenida]);
@@ -57,15 +62,98 @@ function ChatIAMinimal({ notificacionesPendientes = 0, onNotificacionesVistas })
     }
   }, [mensajes]);
 
-  // Función para enviar mensaje a Gemini
-  const enviarMensajeGemini = useCallback(async (mensaje) => {
-    console.log('📤 Enviando mensaje a Gemini:', mensaje);
+  // Función para detectar y procesar comandos de creación de expedientes con OpenAI
+  const procesarComandoExpediente = useCallback(async (mensaje) => {
+    console.log('🤖 Procesando comando de expediente con OpenAI');
     
-    if (!geminiAPI) {
-      console.error('❌ Gemini API no está inicializada');
+    if (!openAIService) {
+      return {
+        tipo: 'error',
+        mensaje: '❌ **Error de servicio**\n\nEl servicio de OpenAI no está disponible. Verifica la configuración.'
+      };
+    }
+    
+    if (!organizacionActual?.id) {
+      return {
+        tipo: 'error',
+        mensaje: '❌ **Error de organización**\n\nNo hay una organización activa. No puedo crear expedientes sin una organización válida.'
+      };
+    }
+
+    try {
+      // Usar OpenAI Service para procesar el mensaje
+      const resultado = await openAIService.procesarMensaje(mensaje);
+      
+      if (!resultado.success) {
+        throw new Error(resultado.error);
+      }
+
+      if (resultado.tipo === 'creacion_caso') {
+        console.log('📋 OpenAI detectó comando de creación de caso');
+        
+        // Validar datos extraídos
+        const validacion = openAIService.validarDatosCaso(resultado.datos);
+        
+        if (!validacion.valido) {
+          return {
+            tipo: 'error',
+            mensaje: `❌ **Información insuficiente**\n\n${validacion.errores.join('\n')}\n\n**Ejemplo:** "Crear expediente para Juan Pérez, caso de divorcio, expediente 123-2024"`
+          };
+        }
+
+        // Completar datos faltantes
+        const datosCompletos = openAIService.completarDatosCaso(resultado.datos);
+        console.log('📊 Datos completados para crear caso:', datosCompletos);
+
+        // Crear el expediente usando el hook existente
+        const resultadoCreacion = await agregarCaso(datosCompletos);
+        
+        if (resultadoCreacion.success) {
+          return {
+            tipo: 'exito',
+            mensaje: `✅ **¡Expediente creado exitosamente con OpenAI!**\n\n📋 **Detalles del expediente:**\n• **Número:** ${datosCompletos.numero}\n• **Cliente:** ${datosCompletos.cliente}\n• **Tipo:** ${datosCompletos.tipo.toUpperCase()}\n• **Estado:** ${datosCompletos.estado}\n• **Prioridad:** ${datosCompletos.prioridad}\n\n🤖 **Procesado con IA avanzada:**\n• Datos extraídos automáticamente por OpenAI GPT-4\n• Campos completados inteligentemente\n• Validación automática de información\n\n🎯 **El expediente ya está disponible en la sección "Expedientes"**\n\n💡 **Tip:** Puedes pedirme que cree más expedientes con información más detallada.`,
+            expedienteCreado: datosCompletos
+          };
+        } else {
+          throw new Error('Error al crear el expediente en la base de datos');
+        }
+      } else {
+        // No es comando de creación, devolver null para procesamiento normal
+        return null;
+      }
+      
+    } catch (error) {
+      console.error('❌ Error procesando comando de expediente con OpenAI:', error);
+      
+      let mensajeError = '❌ **Error creando expediente con OpenAI**\n\n';
+      
+      if (error.message?.includes('API Key')) {
+        mensajeError += 'Error de configuración de OpenAI. Verifica que la API key esté configurada correctamente.';
+      } else if (error.message?.includes('JSON')) {
+        mensajeError += 'Error procesando los datos del expediente. Intenta ser más específico con la información.';
+      } else if (error.message?.includes('organización')) {
+        mensajeError += 'No hay una organización activa para crear el expediente.';
+      } else {
+        mensajeError += `Error: ${error.message || 'No pude crear el expediente. Intenta nuevamente.'}`;
+      }
+      
+      mensajeError += '\n\n**Formato sugerido:** "Crear expediente para [Cliente], caso de [tipo], expediente [número]"';
+      
+      return {
+        tipo: 'error',
+        mensaje: mensajeError
+      };
+    }
+  }, [openAIService, organizacionActual, agregarCaso]);
+  // Función para enviar mensaje a OpenAI
+  const enviarMensajeOpenAI = useCallback(async (mensaje) => {
+    console.log('📤 Enviando mensaje a OpenAI:', mensaje);
+    
+    if (!openAIService) {
+      console.error('❌ OpenAI Service no está inicializado');
       const mensajeError = {
         tipo: 'ia',
-        texto: '❌ **Error de configuración**\n\nLa API de Gemini no está disponible. Verifica la configuración.',
+        texto: '❌ **Error de configuración**\n\nEl servicio de OpenAI no está disponible. Verifica la configuración de la API key.',
         timestamp: new Date()
       };
       setMensajes(prev => [...prev, mensajeError]);
@@ -75,40 +163,52 @@ function ChatIAMinimal({ notificacionesPendientes = 0, onNotificacionesVistas })
     setCargando(true);
 
     try {
-      // Contexto jurídico más simple para Gemini
-      const prompt = `Eres LEYIA, un asistente jurídico especializado. Responde de manera profesional y precisa sobre temas legales. Si no estás seguro de algo, indícalo claramente. Usa un lenguaje claro pero técnicamente correcto.
-
-Pregunta: ${mensaje}`;
-
-      console.log('🔄 Enviando prompt a Gemini...');
-      const result = await geminiAPI.generateContent(prompt);
-      console.log('✅ Respuesta recibida de Gemini');
+      // Primero verificar si es un comando de creación de expediente
+      const resultadoComando = await procesarComandoExpediente(mensaje);
       
-      const response = await result.response;
-      const respuestaIA = response.text();
+      if (resultadoComando) {
+        // Es un comando de expediente, mostrar el resultado
+        const mensajeRespuesta = {
+          tipo: 'ia',
+          texto: resultadoComando.mensaje,
+          timestamp: new Date(),
+          esComandoExpediente: true,
+          expedienteCreado: resultadoComando.expedienteCreado || null,
+          servicioUsado: 'OpenAI'
+        };
+        
+        setMensajes(prev => [...prev, mensajeRespuesta]);
+        return;
+      }
+
+      // Si no es comando de expediente, procesar como consulta general con OpenAI
+      console.log('🤖 Procesando consulta general con OpenAI');
+      const resultado = await openAIService.procesarMensaje(mensaje, mensajes.slice(-5));
       
-      console.log('📝 Texto de respuesta:', respuestaIA);
+      if (resultado.success && resultado.tipo === 'consulta_general') {
+        const mensajeRespuesta = {
+          tipo: 'ia',
+          texto: resultado.respuesta,
+          timestamp: new Date(),
+          servicioUsado: 'OpenAI'
+        };
+        
+        setMensajes(prev => [...prev, mensajeRespuesta]);
+      } else {
+        throw new Error(resultado.error || 'Error procesando consulta general');
+      }
 
-      const mensajeRespuesta = {
-        tipo: 'ia',
-        texto: respuestaIA,
-        timestamp: new Date()
-      };
-
-      setMensajes(prev => [...prev, mensajeRespuesta]);
     } catch (error) {
-      console.error('❌ Error detallado al comunicarse con Gemini:', error);
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error stack:', error.stack);
+      console.error('❌ Error detallado al comunicarse con OpenAI:', error);
       
-      let mensajeError = '❌ **Error de comunicación**\n\n';
+      let mensajeError = '❌ **Error de comunicación con OpenAI**\n\n';
       
-      if (error.message?.includes('API_KEY_INVALID')) {
-        mensajeError += 'La API key de Gemini no es válida.';
-      } else if (error.message?.includes('QUOTA_EXCEEDED')) {
-        mensajeError += 'Se ha excedido la cuota de la API de Gemini.';
-      } else if (error.message?.includes('MODEL_NOT_FOUND')) {
-        mensajeError += 'El modelo de Gemini no está disponible.';
+      if (error.message?.includes('API Key') || error.message?.includes('401')) {
+        mensajeError += 'La API key de OpenAI no es válida o no está configurada correctamente.\n\n🔧 **Solución:**\n• Verifica que REACT_APP_OPENAI_API_KEY esté en el archivo .env\n• Asegúrate de que la API key sea válida\n• Recarga la página después de configurar';
+      } else if (error.message?.includes('429') || error.message?.includes('QUOTA_EXCEEDED')) {
+        mensajeError += 'Se ha excedido la cuota de uso de OpenAI.\n\n💡 **Soluciones:**\n• Verifica tu plan de OpenAI\n• Intenta nuevamente más tarde\n• Revisa el uso en tu dashboard de OpenAI';
+      } else if (error.message?.includes('500')) {
+        mensajeError += 'Error interno de OpenAI. Intenta nuevamente en unos momentos.';
       } else {
         mensajeError += `Error: ${error.message || 'No pude procesar tu consulta. Por favor, intenta nuevamente.'}`;
       }
@@ -116,13 +216,14 @@ Pregunta: ${mensaje}`;
       const mensajeErrorObj = {
         tipo: 'ia',
         texto: mensajeError,
-        timestamp: new Date()
+        timestamp: new Date(),
+        servicioUsado: 'Error'
       };
       setMensajes(prev => [...prev, mensajeErrorObj]);
     } finally {
       setCargando(false);
     }
-  }, [geminiAPI]);
+  }, [openAIService, procesarComandoExpediente, mensajes]);
 
   // Manejar envío de mensaje
   const manejarEnvio = useCallback(async (e) => {
@@ -140,8 +241,8 @@ Pregunta: ${mensaje}`;
     const mensajeParaEnviar = inputMensaje.trim();
     setInputMensaje('');
 
-    await enviarMensajeGemini(mensajeParaEnviar);
-  }, [inputMensaje, cargando, enviarMensajeGemini]);
+    await enviarMensajeOpenAI(mensajeParaEnviar);
+  }, [inputMensaje, cargando, enviarMensajeOpenAI]);
 
   // Funciones de drag and drop
   const iniciarArrastre = useCallback((e) => {
@@ -411,11 +512,24 @@ Pregunta: ${mensaje}`;
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                   fontSize: '14px',
                   lineHeight: '1.4',
-                  border: mensaje.tipo === 'ia' ? '1px solid #e5e7eb' : 'none'
+                  border: mensaje.tipo === 'ia' ? '1px solid #e5e7eb' : 'none',
+                  borderLeft: mensaje.esComandoExpediente ? '4px solid #10b981' : 'none'
                 }}>
                   <div dangerouslySetInnerHTML={{ 
                     __html: formatearMensaje(mensaje.texto) 
                   }} />
+                  {mensaje.expedienteCreado && (
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '8px',
+                      backgroundColor: '#f0fdf4',
+                      borderRadius: '8px',
+                      border: '1px solid #bbf7d0',
+                      fontSize: '12px'
+                    }}>
+                      <strong>🎯 Expediente creado:</strong> {mensaje.expedienteCreado.numero}
+                    </div>
+                  )}
                   <div style={{
                     fontSize: '11px',
                     opacity: 0.7,

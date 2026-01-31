@@ -37,6 +37,24 @@ client_secret_*.json
 google-oauth-*.json
 *.oauth.json
 
-# Variables de entorno
+# Variables de entorno (CRÍTICO - NO SUBIR)
 .env
 .env.*
+!.env.example
+
+# API Keys y configuraciones sensibles (NO SUBIR)
+*api-key*
+*API_KEY*
+*firebase-config*
+*openai-config*
+
+# Archivos de prueba con credenciales
+test-*-real.js
+*-with-keys.js
+*-production.js
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.temp
+debug-*.js

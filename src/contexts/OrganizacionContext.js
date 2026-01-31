@@ -31,7 +31,7 @@ export const OrganizacionProvider = ({ children }) => {
         orgData.id || orgData.name || orgData.nombre) {
       
       const normalizada = {
-        id: orgData.organizationId || orgData.id || 'default-org',
+        id: orgData.organizationId || orgData.id || 'leyiapro-org',
         nombre: orgData.organizationName || orgData.name || orgData.nombre || 'Organización',
         tipo: orgData.organizationType || orgData.type || orgData.tipo || 'estudio_juridico'
       };

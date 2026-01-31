@@ -163,9 +163,9 @@ function AppContent() {
       try {
         const fakeUser = JSON.parse(devUser);
         const fakeOrganization = {
-          organizationId: 'dev-org-123',
-          organizationName: 'ESTUDIO JURÍDICO DE DESARROLLO',
-          organizationType: 'law-firm'
+          organizationId: 'leyiapro-org',
+          organizationName: 'ESTUDIO JURÍDICO LEYIA',
+          organizationType: 'estudio'
         };
         
         console.log('✅ Configurando usuario de desarrollo:', fakeUser.email);
@@ -322,7 +322,7 @@ function AppContent() {
     if (loginData.user && (loginData.user.uid === 'dev-user-123' || loginData.user.uid === 'temp-user-123')) {
       const fakeUser = loginData.user;
       const fakeOrganization = {
-        organizationId: 'dev-org-123',
+        organizationId: 'leyiapro-org',
         organizationName: 'ESTUDIO JURÍDICO LEYIA',
         organizationType: 'estudio'
       };
@@ -578,9 +578,9 @@ function AppContent() {
     if (!orgGuardada) {
       // Solo crear organización por defecto si NO hay una guardada
       const defaultOrganization = {
-        organizationId: 'default-org',
-        organizationName: 'ESTUDIO JURÍDICO DEFAULT',
-        organizationType: 'law-firm'
+        organizationId: 'leyiapro-org',
+        organizationName: 'ESTUDIO JURÍDICO LEYIA',
+        organizationType: 'estudio'
       };
       
       setOrganizationPersistent(defaultOrganization);
