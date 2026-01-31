@@ -1,6 +1,9 @@
 /**
  * VERIFICACIÓN COMPLETA - CAMBIO DE FIREBASE SEGÚN HOJA DE RUTA
  * Ejecutar: node verificacion-completa-firebase.js
+ * 
+ * ⚠️ NOTA DE SEGURIDAD: Este archivo ya no contiene API keys hardcodeadas
+ * Las credenciales deben estar en archivos .env (que están en .gitignore)
  */
 
 const fs = require('fs');
@@ -8,10 +11,10 @@ const path = require('path');
 
 console.log('🔍 VERIFICACIÓN COMPLETA DEL CAMBIO DE FIREBASE...\n');
 
-// Configuración esperada
+// Configuración esperada (usando variables de entorno por seguridad)
 const EXPECTED_CONFIG = {
   projectId: 'leyiapro',
-  apiKey: 'AIzaSyB5JRCOHwmniqxoeIrszwW4mm5V_x5DaaI',
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || '[API_KEY_FROM_ENV]',
   authDomain: 'leyiapro.firebaseapp.com',
   storageBucket: 'leyiapro.firebasestorage.app',
   messagingSenderId: '224412501560',
@@ -40,7 +43,7 @@ function verificarConfiguracionEnv() {
   if (envContent) {
     const checks = [
       { key: 'REACT_APP_FIREBASE_PROJECT_ID', expected: EXPECTED_CONFIG.projectId },
-      { key: 'REACT_APP_FIREBASE_API_KEY', expected: EXPECTED_CONFIG.apiKey },
+      { key: 'REACT_APP_FIREBASE_API_KEY', expected: 'API_KEY_CONFIGURADA' }, // Verificar que existe, no el valor
       { key: 'REACT_APP_FIREBASE_AUTH_DOMAIN', expected: EXPECTED_CONFIG.authDomain },
       { key: 'REACT_APP_FIREBASE_STORAGE_BUCKET', expected: EXPECTED_CONFIG.storageBucket },
       { key: 'REACT_APP_FIREBASE_MESSAGING_SENDER_ID', expected: EXPECTED_CONFIG.messagingSenderId },
@@ -50,7 +53,14 @@ function verificarConfiguracionEnv() {
     checks.forEach(check => {
       const regex = new RegExp(`${check.key}=(.+)`);
       const match = envContent.match(regex);
-      if (match && match[1] === check.expected) {
+      if (check.key === 'REACT_APP_FIREBASE_API_KEY') {
+        // Para API key, solo verificar que existe y no está vacía
+        if (match && match[1] && match[1].length > 10) {
+          console.log(`   ✅ ${check.key}: Configurada correctamente`);
+        } else {
+          console.log(`   ❌ ${check.key}: No encontrada o vacía`);
+        }
+      } else if (match && match[1] === check.expected) {
         console.log(`   ✅ ${check.key}: Correcto`);
       } else {
         console.log(`   ❌ ${check.key}: ${match ? match[1] : 'No encontrado'} (esperado: ${check.expected})`);
